@@ -1,0 +1,3432 @@
+<!doctype html>
+<html lang="lv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Angļu valoda</title>
+<style>
+:root{--bg:#fffaf0;--card:#fff;--ink:#222;--mute:#777;--acc:#f5b800;--acc2:#6c3fc5;--ok:#2e9e5b;--bad:#d64545;--line:#eadfc4}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink)}
+header{background:var(--acc);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+header h1{margin:0;font-size:20px}
+nav{display:flex;gap:6px;flex-wrap:wrap}
+nav button{border:0;background:#ffffff80;padding:8px 14px;border-radius:20px;font-size:15px;cursor:pointer}
+nav button.on{background:var(--acc2);color:#fff}
+main{max-width:720px;margin:0 auto;padding:16px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:16px}
+.big{font-size:34px;font-weight:700;text-align:center;margin:18px 0}
+.sub{color:var(--mute);text-align:center}
+.row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:10px 0}
+button.b{border:0;border-radius:12px;padding:12px 18px;font-size:16px;cursor:pointer;background:var(--acc2);color:#fff}
+button.b.alt{background:#eee;color:var(--ink)}
+button.b.ok{background:var(--ok)} button.b.bad{background:var(--bad)}
+button.b.y{background:var(--acc);color:#222}
+input[type=text],textarea{width:100%;padding:12px;font-size:18px;border:2px solid var(--line);border-radius:12px;font-family:inherit}
+textarea{min-height:120px;font-size:16px}
+.stats{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:12px}
+.pill{background:#fff;border:1px solid var(--line);border-radius:20px;padding:6px 12px;font-size:14px}
+.txt{font-size:20px;line-height:1.9;white-space:pre-wrap}
+#pop{max-height:60vh;overflow:auto}
+#ps{margin:6px 0 10px;color:#444;white-space:pre-wrap;font-size:16px}
+.txt span.w{cursor:pointer;border-radius:4px;padding:0 1px}
+.txt span.w:hover{background:#fde9a0}
+.txt span.known{border-bottom:2px dotted var(--ok)}
+#pop{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:3px solid var(--acc2);padding:16px;box-shadow:0 -4px 20px #0003;display:none}
+#pop .in{max-width:720px;margin:0 auto}
+#pop .wd{font-size:24px;font-weight:700}
+#pop .tr{font-size:20px;margin:6px 0 10px;color:var(--acc2)}
+.msg{white-space:pre-line;text-align:center;font-size:18px;margin:8px 0;min-height:26px}
+.ok-t{color:var(--ok)} .bad-t{color:var(--bad)}
+.list button{display:block;width:100%;text-align:left;margin-bottom:8px}
+small.hint{color:var(--mute)}
+</style>
+</head>
+<body>
+<header>
+  <h1>🇬🇧 Angļu valoda</h1>
+  <nav id="nav"></nav>
+</header>
+<main id="app"></main>
+<div id="pop"><div class="in">
+  <div class="wd" id="pw"></div><div class="tr" id="pt"></div><div id="ps"></div>
+  <div class="row" style="justify-content:flex-start">
+    <button class="b alt" id="pspeak">🔊</button>
+    <button class="b alt" id="psent">📝 Teikums</button>
+    <button class="b y" id="padd">＋ Pievienot kartītēm</button>
+    <button class="b alt" id="pclose">Aizvērt</button>
+  </div>
+</div></div>
+
+<script>
+/* ============ VĀRDU KRĀJUMS (angļu | latviešu) ============ */
+const A1_STR = `hello|sveiki;goodbye|uz redzēšanos;please|lūdzu;thank you|paldies;yes|jā;no|nē;sorry|atvainojiet;
+water|ūdens;food|ēdiens;bread|maize;milk|piens;coffee|kafija;tea|tēja;apple|ābols;egg|ola;cheese|siers;meat|gaļa;fish|zivs;
+house|māja;home|mājas;room|istaba;door|durvis;window|logs;table|galds;chair|krēsls;bed|gulta;
+car|automašīna;bus|autobuss;train|vilciens;road|ceļš;city|pilsēta;work|darbs;office|birojs;money|nauda;price|cena;shop|veikals;
+buy|pirkt;sell|pārdot;pay|maksāt;time|laiks;day|diena;night|nakts;morning|rīts;evening|vakars;week|nedēļa;year|gads;
+today|šodien;tomorrow|rīt;yesterday|vakar;now|tagad;always|vienmēr;never|nekad;
+man|vīrietis;woman|sieviete;child|bērns;friend|draugs;family|ģimene;mother|māte;father|tēvs;brother|brālis;sister|māsa;dog|suns;cat|kaķis;
+go|iet;come|nākt;see|redzēt;hear|dzirdēt;speak|runāt;read|lasīt;write|rakstīt;eat|ēst;drink|dzert;sleep|gulēt;walk|staigāt;run|skriet;
+know|zināt;think|domāt;want|gribēt;need|vajadzēt;like|patikt;love|mīlēt;help|palīdzēt;give|dot;take|ņemt;make|darīt;ask|jautāt;answer|atbildēt;open|atvērt;close|aizvērt;
+big|liels;small|mazs;good|labs;bad|slikts;new|jauns;old|vecs;hot|karsts;cold|auksts;happy|laimīgs;easy|viegls;difficult|grūts;fast|ātrs;slow|lēns;
+red|sarkans;blue|zils;green|zaļš;black|melns;white|balts;
+one|viens;two|divi;three|trīs;four|četri;five|pieci;six|seši;seven|septiņi;eight|astoņi;nine|deviņi;ten|desmit`;
+const A2_STR = `afraid|nobijies;airport|lidosta;angry|dusmīgs;arrive|ierasties;bag|soma;beautiful|skaists;begin|sākt;borrow|aizņemties;boring|garlaicīgs;breakfast|brokastis;lunch|pusdienas;dinner|vakariņas;build|būvēt;busy|aizņemts;careful|uzmanīgs;carry|nest;cheap|lēts;expensive|dārgs;choose|izvēlēties;clean|tīrs;dirty|netīrs;clothes|apģērbs;cook|gatavot;dangerous|bīstams;decide|izlemt;early|agri;late|vēlu;empty|tukšs;full|pilns;enough|pietiekami;enjoy|baudīt;forget|aizmirst;remember|atcerēties;free|brīvs;future|nākotne;past|pagātne;garden|dārzs;gift|dāvana;health|veselība;hungry|izsalcis;thirsty|izslāpis;idea|ideja;important|svarīgs;invite|uzaicināt;join|pievienoties;journey|ceļojums;keep|paturēt;kitchen|virtuve;learn|mācīties;leave|aiziet;lend|aizdot;lose|pazaudēt;find|atrast;meet|satikt;miss|ilgoties;mistake|kļūda;neighbour|kaimiņš;noisy|trokšņains;quiet|kluss;often|bieži;sometimes|dažreiz;ticket|biļete;travel|ceļot;weather|laikapstākļi;wait|gaidīt;wear|valkāt;worry|uztraukties;message|ziņa;meeting|sapulce;boss|priekšnieks;customer|klients;holiday|brīvdienas`;
+const B1_STR = `achieve|sasniegt;advice|padoms;agree|piekrist;allow|atļaut;although|lai gan;ability|spēja;attitude|attieksme;benefit|ieguvums;challenge|izaicinājums;compare|salīdzināt;complain|sūdzēties;confident|pārliecināts;consider|apsvērt;continue|turpināt;control|kontrolēt;creative|radošs;damage|bojājums;depend|būt atkarīgam;develop|attīstīt;discuss|apspriest;effort|pūles;encourage|iedrošināt;environment|vide;experience|pieredze;explain|izskaidrot;fail|neizdoties;fix|salabot;improve|uzlabot;increase|palielināt;decrease|samazināt;influence|ietekme;install|uzstādīt;introduce|iepazīstināt;knowledge|zināšanas;manage|vadīt;opinion|viedoklis;opportunity|iespēja;order|pasūtīt;prefer|dot priekšroku;prepare|sagatavot;prevent|novērst;produce|ražot;promise|solījums;provide|nodrošināt;reduce|mazināt;refuse|atteikties;relationship|attiecības;request|lūgums;require|prasīt;responsible|atbildīgs;result|rezultāts;risk|risks;solve|atrisināt;spend|tērēt;suggest|ieteikt;support|atbalstīt;treat|izturēties;trust|uzticēties;unfortunately|diemžēl;however|tomēr;wonder|prātot;deadline|termiņš;salary|alga;invoice|rēķins;report|ziņojums;delivery|piegāde;warranty|garantija;engine|dzinējs;brake|bremze;tyre|riepa;repair|remontēt;insurance|apdrošināšana;spare part|rezerves daļa`;
+const parse=(str,l)=>str.split(';').map(x=>x.trim().split('|')).filter(a=>a.length===2).map(a=>[a[0],a[1],l]);
+/*WORDS_START*/
+const EXTRA=`because|jo|A2
+but|bet|A2
+or|vai|A2
+if|ja|A2
+when|kad|A2
+while|kamēr|A2
+before|pirms|A2
+after|pēc|A2
+between|starp|A2
+through|cauri|A2
+during|laikā|A2
+without|bez|A2
+inside|iekšā|A2
+outside|ārā|A2
+near|tuvu|A2
+far|tālu|A2
+behind|aiz|A2
+above|virs|A2
+below|zem|A2
+across|pāri|A2
+along|gar|A2
+against|pret|A2
+around|apkārt|A2
+until|līdz|A2
+since|kopš|A2
+already|jau|A2
+still|joprojām|A2
+yet|vēl|A2
+again|atkal|A2
+almost|gandrīz|A2
+only|tikai|A2
+also|arī|A2
+even|pat|A2
+just|tikko|A2
+really|patiešām|A2
+maybe|varbūt|A2
+probably|droši vien|A2
+perhaps|iespējams|A2
+quite|diezgan|A2
+very|ļoti|A2
+too|pārāk|A2
+together|kopā|A2
+alone|viens pats|A2
+everyone|visi|A2
+someone|kāds|A2
+anything|jebkas|A2
+nothing|nekas|A2
+everything|viss|A2
+nobody|neviens|A2
+somewhere|kaut kur|A2
+everywhere|visur|A2
+other|cits|A2
+another|vēl viens|A2
+same|tāds pats|A2
+different|atšķirīgs, savādāks, citāds|A2
+each|katrs|A2
+every|ikviens|A2
+both|abi|A2
+many|daudzi|A2
+much|daudz|A2
+few|nedaudzi|A2
+little|mazliet|A2
+several|vairāki|A2
+most|lielākā daļa|A2
+more|vairāk|A2
+less|mazāk|A2
+first|pirmais|A2
+second|otrais/sekunde|A2
+last|pēdējais|A2
+next|nākamais|A2
+half|puse|A2
+minute|minūte|A2
+hour|stunda|A2
+month|mēnesis|A2
+weekend|nedēļas nogale|A2
+Monday|pirmdiena|A2
+Tuesday|otrdiena|A2
+Wednesday|trešdiena|A2
+Thursday|ceturtdiena|A2
+Friday|piektdiena|A2
+Saturday|sestdiena|A2
+Sunday|svētdiena|A2
+January|janvāris|A2
+February|februāris|A2
+March|marts|A2
+April|aprīlis|A2
+May|maijs|A2
+June|jūnijs|A2
+July|jūlijs|A2
+August|augusts|A2
+September|septembris|A2
+October|oktobris|A2
+November|novembris|A2
+December|decembris|A2
+spring|pavasaris|A2
+summer|vasara|A2
+autumn|rudens|A2
+winter|ziema|A2
+season|gadalaiks|A2
+rain|lietus|A2
+snow|sniegs|A2
+wind|vējš|A2
+sun|saule|A2
+cloud|mākonis|A2
+storm|vētra|A2
+fog|migla|A2
+ice|ledus|A2
+warm|silts|A2
+cool|vēss|A2
+wet|slapjš|A2
+dry|sauss|A2
+sunny|saulains|A2
+cloudy|mākoņains|A2
+windy|vējains|A2
+temperature|temperatūra|A2
+head|galva|A2
+face|seja|A2
+eye|acs|A2
+ear|auss|A2
+nose|deguns|A2
+mouth|mute|A2
+tooth|zobs|A2
+hair|mati|A2
+neck|kakls|A2
+shoulder|plecs|A2
+arm|roka|A2
+hand|plauksta|A2
+finger|pirksts|A2
+leg|kāja|A2
+foot|pēda|A2
+knee|celis|A2
+back|mugura|A2
+chest|krūtis|A2
+stomach|vēders|A2
+heart|sirds|A2
+skin|āda|A2
+blood|asinis|A2
+bone|kauls|A2
+body|ķermenis|A2
+voice|balss|A2
+lip|lūpa|A2
+brain|smadzenes|A2
+doctor|ārsts|A2
+nurse|medmāsa|A2
+hospital|slimnīca|A2
+medicine|zāles|A2
+pain|sāpes|A2
+headache|galvassāpes|A2
+fever|drudzis|A2
+cough|klepus|A2
+ill|slims|A2
+tired|noguris|A2
+healthy|vesels|A2
+injury|trauma|A2
+pill|tablete|A2
+patient|pacients|A2
+dentist|zobārsts|A2
+appointment|pieraksts|A2
+rice|rīsi|A2
+pasta|makaroni|A2
+soup|zupa|A2
+salad|salāti|A2
+sandwich|sviestmaize|A2
+butter|sviests|A2
+sugar|cukurs|A2
+salt|sāls|A2
+pepper|pipari|A2
+oil|eļļa|A2
+vegetable|dārzenis|A2
+fruit|auglis|A2
+potato|kartupelis|A2
+tomato|tomāts|A2
+onion|sīpols|A2
+carrot|burkāns|A2
+banana|banāns|A2
+orange|apelsīns|A2
+lemon|citrons|A2
+strawberry|zemene|A2
+chicken|vista|A2
+beef|liellopu gaļa|A2
+pork|cūkgaļa|A2
+sausage|desa|A2
+cake|kūka|A2
+chocolate|šokolāde|A2
+ice cream|saldējums|A2
+juice|sula|A2
+beer|alus|A2
+wine|vīns|A2
+bottle|pudele|A2
+glass|glāze|A2
+cup|krūze|A2
+plate|šķīvis|A2
+bowl|bļoda|A2
+knife|nazis|A2
+fork|dakša|A2
+spoon|karote|A2
+menu|ēdienkarte|A2
+bill|rēķins|A2
+tip|dzeramnauda|A2
+restaurant|restorāns|A2
+waiter|viesmīlis|A2
+floor|grīda|A2
+wall|siena|A2
+roof|jumts|A2
+stairs|kāpnes|A2
+bathroom|vannasistaba|A2
+bedroom|guļamistaba|A2
+living room|dzīvojamā istaba|A2
+toilet|tualete|A2
+shower|duša|A2
+lamp|lampa|A2
+key|atslēga|A2
+mirror|spogulis|A2
+carpet|paklājs|A2
+curtain|aizkars|A2
+fridge|ledusskapis|A2
+oven|krāsns|A2
+cupboard|skapis|A2
+shelf|plaukts|A2
+bin|miskaste|A2
+towel|dvielis|A2
+soap|ziepes|A2
+blanket|sega|A2
+pillow|spilvens|A2
+furniture|mēbeles|A2
+apartment|dzīvoklis|A2
+shirt|krekls|A2
+trousers|bikses|A2
+jeans|džinsi|A2
+dress|kleita|A2
+skirt|svārki|A2
+jacket|jaka|A2
+coat|mētelis|A2
+hat|cepure|A2
+shoe|kurpe|A2
+sock|zeķe|A2
+glove|cimds|A2
+scarf|šalle|A2
+belt|josta|A2
+pocket|kabata|A2
+bicycle|velosipēds|A2
+motorcycle|motocikls|A2
+plane|lidmašīna|A2
+ship|kuģis|A2
+boat|laiva|A2
+taxi|taksometrs|A2
+station|stacija|A2
+street|iela|A2
+bridge|tilts|A2
+corner|stūris|A2
+traffic|satiksme|A2
+driver|vadītājs|A2
+passenger|pasažieris|A2
+luggage|bagāža|A2
+passport|pase|A2
+map|karte|A2
+petrol|benzīns|A2
+parking|stāvvieta|A2
+wheel|ritenis|A2
+accident|negadījums|A2
+speed|ātrums|A2
+school|skola|A2
+university|universitāte|A2
+student|students|A2
+teacher|skolotājs|A2
+lesson|nodarbība|A2
+exam|eksāmens|A2
+homework|mājasdarbs|A2
+subject|priekšmets|A2
+class|klase|A2
+course|kurss|A2
+library|bibliotēka|A2
+pen|pildspalva|A2
+pencil|zīmulis|A2
+paper|papīrs|A2
+book|grāmata|A2
+newspaper|avīze|A2
+magazine|žurnāls|A2
+letter|vēstule|A2
+email|e-pasts|A2
+phone|tālrunis|A2
+computer|dators|A2
+screen|ekrāns|A2
+keyboard|tastatūra|A2
+internet|internets|A2
+website|tīmekļa vietne|A2
+password|parole|A2
+file|fails|A2
+photo|fotogrāfija|A2
+camera|kamera|A2
+music|mūzika|A2
+song|dziesma|A2
+film|filma|A2
+game|spēle|A2
+team|komanda|A2
+market|tirgus|A2
+supermarket|lielveikals|A2
+cash|skaidra nauda|A2
+credit card|kredītkarte|A2
+receipt|čeks|A2
+discount|atlaide|A2
+sale|izpārdošana|A2
+size|izmērs|A2
+change|mainīt|A2
+bring|atnest|A2
+call|zvanīt|A2
+catch|noķert|A2
+check|pārbaudīt|A2
+climb|kāpt|A2
+count|skaitīt|A2
+cut|griezt|A2
+dance|dejot|A2
+draw|zīmēt|A2
+drive|braukt|A2
+fall|krist|A2
+feel|just|A2
+fill|piepildīt|A2
+finish|pabeigt|A2
+fly|lidot|A2
+follow|sekot|A2
+hold|turēt|A2
+hope|cerēt|A2
+hurt|sāpināt|A2
+jump|lēkt|A2
+kiss|skūpstīt|A2
+laugh|smieties|A2
+listen|klausīties|A2
+look|skatīties|A2
+move|pārvietot|A2
+pass|pasniegt|A2
+pick|izvēlēties|A2
+play|spēlēt|A2
+pull|vilkt|A2
+push|stumt|A2
+put|likt|A2
+reach|sasniegt|A2
+return|atgriezties|A2
+ride|jāt|A2
+ring|zvanīt|A2
+save|glābt|A2
+say|teikt|A2
+send|sūtīt|A2
+show|parādīt|A2
+sing|dziedāt|A2
+sit|sēdēt|A2
+smile|smaidīt|A2
+stand|stāvēt|A2
+start|sākt|A2
+stay|palikt|A2
+stop|apstāties|A2
+swim|peldēt|A2
+talk|runāt|A2
+teach|mācīt|A2
+tell|stāstīt|A2
+throw|mest|A2
+touch|pieskarties|A2
+try|mēģināt|A2
+turn|griezties|A2
+use|lietot|A2
+visit|apmeklēt|A2
+watch|vērot|A2
+win|uzvarēt|A2
+lose weight|zaudēt svaru|A2
+shout|kliegt|A2
+whisper|čukstēt|A2
+cry|raudāt|A2
+wake up|pamosties|A2
+get up|piecelties|A2
+sit down|apsēsties|A2
+look for|meklēt|A2
+look after|rūpēties|A2
+turn on|ieslēgt|A2
+turn off|izslēgt|A2
+pick up|pacelt|A2
+put on|uzvilkt|A2
+take off|novilkt|A2
+come back|atgriezties|A2
+go out|iziet|A2
+give back|atdot|A2
+find out|uzzināt|A2
+fill in|aizpildīt|A2
+wait for|gaidīt|A2
+tall|garš|A2
+short|īss|A2
+thin|tievs|A2
+fat|resns|A2
+heavy|smags|A2
+light|viegls|A2
+strong|spēcīgs|A2
+weak|vājš|A2
+rich|bagāts|A2
+poor|nabadzīgs|A2
+young|jauns|A2
+clever|gudrs|A2
+stupid|muļķīgs|A2
+funny|smieklīgs|A2
+serious|nopietns|A2
+kind|laipns|A2
+rude|rupjš|A2
+polite|pieklājīgs|A2
+friendly|draudzīgs|A2
+lazy|slinks|A2
+shy|kautrīgs|A2
+proud|lepns|A2
+sad|skumjš|A2
+lonely|vientuļš|A2
+nervous|nervozs|A2
+excited|sajūsmināts|A2
+surprised|pārsteigts|A2
+worried|noraizējies|A2
+pleased|apmierināts|A2
+interesting|interesanti|A2
+exciting|aizraujošs|A2
+terrible|briesmīgs|A2
+wonderful|brīnišķīgs|A2
+perfect|ideāls|A2
+wrong|nepareizs|A2
+right|pareizs|A2
+true|patiess|A2
+false|nepatiess|A2
+possible|iespējams|A2
+impossible|neiespējami|A2
+ready|gatavs|A2
+sure|pārliecināts|A2
+safe|drošs|A2
+dark|tumšs|A2
+bright|spilgts|A2
+loud|skaļš|A2
+soft|mīksts|A2
+hard|ciets|A2
+sharp|ass|A2
+smooth|gluds|A2
+flat|plakans|A2
+round|apaļš|A2
+straight|taisns|A2
+deep|dziļš|A2
+wide|plats|A2
+narrow|šaurs|A2
+high|augsts|A2
+low|zems|A2
+actor|aktieris|A2
+age|vecums|A2
+air|gaiss|A2
+angle|leņķis|A2
+area|apgabals|A2
+base|bāze|A2
+block|bloks|A2
+board|dēlis|A2
+bottom|apakša|A2
+top|augša|A2
+side|puse|A2
+button|poga|A2
+centre|centrs|A2
+chain|ķēde|A2
+chart|diagramma|A2
+clerk|ierēdnis|A2
+client|pasūtītājs|A2
+coach|treneris|A2
+coin|monēta|A2
+colour|krāsa|A2
+column|kolonna|A2
+cycle|cikls|A2
+dad|tētis|A2
+mum|mamma|A2
+dozen|ducis|A2
+fan|fans|A2
+farm|ferma|A2
+farmer|zemnieks|A2
+fence|žogs|A2
+frame|rāmis|A2
+gas|gāze|A2
+gold|zelts|A2
+silver|sudrabs|A2
+copper|varš|A2
+steel|tērauds|A2
+grass|zāle|A2
+tree|koks|A2
+flower|zieds|A2
+leaf|lapa|A2
+branch|zars|A2
+seed|sēkla|A2
+root|sakne|A2
+wood|koksne|A2
+hole|caurums|A2
+judge|tiesnesis|A2
+length|garums|A2
+height|augstums|A2
+depth|dziļums|A2
+lorry|kravas automašīna|A2
+mark|zīme|A2
+mate|biedrs|A2
+meal|ēdienreize|A2
+metal|metāls|A2
+kilometre|kilometrs|A2
+metre|metrs|A2
+centimetre|centimetrs|A2
+kilogram|kilograms|A2
+litre|litrs|A2
+mud|dubļi|A2
+needle|adata|A2
+pad|bloknots|A2
+page|lappuse|A2
+path|taka|A2
+pet|mājdzīvnieks|A2
+pipe|caurule|A2
+pitch|laukums|A2
+pole|stabs|A2
+pool|baseins|A2
+post|pasts|A2
+pound|mārciņa|A2
+pub|krogs|A2
+pump|sūknis|A2
+queen|karaliene|A2
+king|karalis|A2
+rail|sliede|A2
+rat|žurka|A2
+mouse|pele|A2
+ray|stars|A2
+sail|bura|A2
+sauce|mērce|A2
+shadow|ēna|A2
+sheet|loksne|A2
+shell|čaula|A2
+sink|izlietne|A2
+sleeve|piedurkne|A2
+soil|augsne|A2
+spot|plankums|A2
+stamp|pastmarka|A2
+string|aukla|A2
+stripe|svītra|A2
+sunrise|saullēkts|A2
+sunset|saulriets|A2
+tail|aste|A2
+tap|krāns|A2
+tank|tvertne|A2
+tin|skārda bundža|A2
+toe|kāju pirksts|A2
+tongue|mēle|A2
+tower|tornis|A2
+toy|rotaļlieta|A2
+track|sliežu ceļš|A2
+tray|paplāte|A2
+umbrella|lietussargs|A2
+van|furgons|A2
+wallet|maks|A2
+weapon|ierocis|A2
+web|tīmeklis|A2
+wire|vads|A2
+wing|spārns|A2
+wool|vilna|A2
+yard|pagalms|A2
+zero|nulle|A2
+bird|putns|A2
+horse|zirgs|A2
+cow|govs|A2
+pig|cūka|A2
+sheep|aita|A2
+duck|pīle|A2
+rabbit|trusis|A2
+bee|bite|A2
+butterfly|taurenis|A2
+spider|zirneklis|A2
+snake|čūska|A2
+wolf|vilks|A2
+fox|lapsa|A2
+deer|briedis|A2
+elephant|ziloņs|A2
+lion|lauva|A2
+tiger|tīģeris|A2
+monkey|pērtiķis|A2
+frog|varde|A2
+cattle|liellopi|A2
+sentence|teikums|A2
+word|vārds|A2
+letter of the alphabet|burts|A2
+alphabet|alfabēts|A2
+grammar|gramatika|A2
+dictionary|vārdnīca|A2
+pronunciation|izruna|A2
+accent|akcents|A2
+translation|tulkojums|A2
+accept|pieņemt|B1
+admit|atzīt|B1
+afford|atļauties|B1
+announce|paziņot|B1
+apologise|atvainoties|B1
+appear|parādīties|B1
+apply|pieteikties|B1
+arrange|sarīkot|B1
+attach|pievienot|B1
+attack|uzbrukt|B1
+avoid|izvairīties|B1
+bake|cept|B1
+bear|izturēt|B1
+beat|sakaut|B1
+belong|piederēt|B1
+bend|saliekt|B1
+blame|vainot|B1
+blow|pūst|B1
+boil|vārīt|B1
+bother|traucēt|B1
+breathe|elpot|B1
+burn|degt|B1
+bury|apglabāt|B1
+calculate|aprēķināt|B1
+cancel|atcelt|B1
+cause|izraisīt|B1
+celebrate|svinēt|B1
+charge|iekasēt maksu|B1
+chase|dzīties pakaļ|B1
+cheat|krāpt|B1
+clap|aplaudēt|B1
+collect|vākt|B1
+combine|apvienot|B1
+communicate|sazināties|B1
+concentrate|koncentrēties|B1
+confirm|apstiprināt|B1
+connect|savienot|B1
+consist|sastāvēt|B1
+contain|saturēt|B1
+copy|kopēt|B1
+cover|pārklāt|B1
+crash|avarēt|B1
+create|radīt|B1
+cross|šķērsot|B1
+deliver|piegādāt|B1
+deny|noliegt|B1
+describe|aprakstīt|B1
+deserve|pelnīt|B1
+destroy|iznīcināt|B1
+discover|atklāt|B1
+divide|dalīt|B1
+doubt|šaubīties|B1
+dream|sapņot|B1
+earn|nopelnīt|B1
+employ|nodarbināt|B1
+enter|ieiet|B1
+escape|izbēgt|B1
+examine|izmeklēt|B1
+exist|pastāvēt|B1
+expect|sagaidīt|B1
+fasten|nostiprināt|B1
+feed|barot|B1
+fit|derēt|B1
+fold|salocīt|B1
+force|piespiest|B1
+forgive|piedot|B1
+freeze|sasalt|B1
+gain|iegūt|B1
+gather|savākt|B1
+grow|augt|B1
+guess|minēt|B1
+hang|karāties|B1
+happen|notikt|B1
+hate|ienīst|B1
+hide|slēpt|B1
+hire|nolīgt|B1
+hit|sist|B1
+hunt|medīt|B1
+identify|identificēt|B1
+ignore|ignorēt|B1
+imagine|iedomāties|B1
+impress|iespaidot|B1
+include|iekļaut|B1
+indicate|norādīt|B1
+inform|informēt|B1
+insist|uzstāt|B1
+intend|nodomāt|B1
+involve|iesaistīt|B1
+knock|klauvēt|B1
+lead|vest|B1
+lift|celt|B1
+link|saistīt|B1
+lock|slēgt|B1
+match|atbilst|B1
+mean|nozīmēt|B1
+measure|mērīt|B1
+melt|kust|B1
+mention|pieminēt|B1
+mix|sajaukt|B1
+nod|pamāt|B1
+notice|pamanīt|B1
+offer|piedāvāt|B1
+operate|darbināt|B1
+owe|būt parādā|B1
+pack|iepakot|B1
+paint|krāsot|B1
+park|novietot|B1
+perform|izpildīt|B1
+pour|liet|B1
+practise|trenēties|B1
+praise|slavēt|B1
+pretend|izlikties|B1
+protect|aizsargāt|B1
+prove|pierādīt|B1
+publish|publicēt|B1
+punish|sodīt|B1
+qualify|kvalificēties|B1
+quit|pamest|B1
+raise|audzināt|B1
+rely|paļauties|B1
+remind|atgādināt|B1
+remove|noņemt|B1
+replace|aizstāt|B1
+research|pētīt|B1
+reserve|rezervēt|B1
+rest|atpūsties|B1
+retire|doties pensijā|B1
+review|pārskatīt|B1
+rob|aplaupīt|B1
+roll|ritināt|B1
+rub|berzt|B1
+rush|steigties|B1
+satisfy|apmierināt|B1
+scare|nobiedēt|B1
+select|atlasīt|B1
+separate|atdalīt|B1
+serve|apkalpot|B1
+settle|nokārtot|B1
+shake|kratīt|B1
+share|dalīties|B1
+shine|spīdēt|B1
+shoot|šaut|B1
+sign|parakstīt|B1
+slip|paslīdēt|B1
+smell|smaržot|B1
+smoke|smēķēt|B1
+sort|šķirot|B1
+spell|burtot|B1
+spread|izplatīt|B1
+steal|zagt|B1
+stick|pielīmēt|B1
+stir|maisīt|B1
+stretch|stiept|B1
+succeed|izdoties|B1
+suffer|ciest|B1
+suit|piestāvēt|B1
+supply|apgādāt|B1
+surprise|pārsteigt|B1
+survive|izdzīvot|B1
+suspect|aizdomāties|B1
+swallow|norīt|B1
+switch|pārslēgt|B1
+tear|plēst|B1
+test|testēt|B1
+thank|pateikties|B1
+tie|sasiet|B1
+translate|tulkot|B1
+trick|piemānīt|B1
+unlock|atslēgt|B1
+upset|sarūgtināt|B1
+vote|balsot|B1
+warn|brīdināt|B1
+wash|mazgāt|B1
+waste|šķiest|B1
+weigh|svērt|B1
+welcome|laipni gaidīt|B1
+wipe|noslaucīt|B1
+wish|vēlēties|B1
+wrap|ietīt|B1
+give up|padoties|B1
+set up|nodibināt|B1
+carry on|turpināt|B1
+break down|salūzt|B1
+break up|šķirties|B1
+bring up|audzināt|B1
+call off|atcelt|B1
+check in|reģistrēties|B1
+check out|izrakstīties|B1
+cheer up|uzmundrināt|B1
+come across|uzdurties|B1
+cut down|samazināt|B1
+deal with|tikt galā ar|B1
+figure out|izdomāt|B1
+get along|sadzīvot|B1
+get over|pārvarēt|B1
+go on|turpināties|B1
+hold on|pagaidīt|B1
+keep up|turēties līdzi|B1
+let down|pievilt|B1
+look forward to|gaidīt ar nepacietību|B1
+make up|izdomāt|B1
+move on|iet tālāk|B1
+point out|norādīt|B1
+run out|beigties|B1
+show up|ierasties|B1
+sort out|nokārtot|B1
+take over|pārņemt|B1
+throw away|izmest|B1
+try on|pielaikot|B1
+turn down|noraidīt|B1
+work out|izdoties|B1
+actual|faktisks|B1
+aware|informēts|B1
+basic|pamata|B1
+brave|drosmīgs|B1
+brief|īss|B1
+broken|salauzts|B1
+calm|mierīgs|B1
+certain|noteikts|B1
+cheerful|jautrs|B1
+clear|skaidrs|B1
+common|kopīgs|B1
+complicated|sarežģīts|B1
+concerned|norūpējies|B1
+convenient|ērts|B1
+crazy|traks|B1
+curious|ziņkārīgs|B1
+current|pašreizējs|B1
+daily|ikdienas|B1
+dead|miris|B1
+delicious|garšīgs|B1
+desperate|izmisis|B1
+direct|tiešs|B1
+disappointed|vīlies|B1
+eager|dedzīgs|B1
+electric|elektrisks|B1
+embarrassed|samulsis|B1
+entire|viss|B1
+equal|vienāds|B1
+essential|būtisks|B1
+exact|precīzs|B1
+extra|papildu|B1
+familiar|pazīstams|B1
+famous|slavens|B1
+fair|taisnīgs|B1
+fashionable|moderns|B1
+female|sieviešu|B1
+foreign|ārzemju|B1
+formal|oficiāls|B1
+frightened|nobiedēts|B1
+fresh|svaigs|B1
+general|vispārējs|B1
+generous|devīgs|B1
+gentle|maigs|B1
+global|globāls|B1
+guilty|vainīgs|B1
+handsome|izskatīgs|B1
+harmless|nekaitīgs|B1
+honest|godīgs|B1
+huge|milzīgs|B1
+identical|identisks|B1
+illegal|nelikumīgs|B1
+immediate|tūlītējs|B1
+incredible|neticams|B1
+independent|neatkarīgs|B1
+individual|individuāls|B1
+informal|neformāls|B1
+innocent|nevainīgs|B1
+intelligent|inteliģents|B1
+internal|iekšējs|B1
+jealous|greizsirdīgs|B1
+lovely|burvīgs|B1
+loyal|lojāls|B1
+male|vīriešu|B1
+mental|garīgs|B1
+modern|mūsdienīgs|B1
+natural|dabisks|B1
+necessary|nepieciešams|B1
+normal|normāls|B1
+obvious|acīmredzams|B1
+odd|dīvains|B1
+ordinary|parasts|B1
+original|oriģināls|B1
+outdoor|āra|B1
+painful|sāpīgs|B1
+particular|konkrēts|B1
+personal|personisks|B1
+physical|fizisks|B1
+plain|vienkāršs|B1
+pleasant|patīkams|B1
+popular|populārs|B1
+powerful|varens|B1
+practical|praktisks|B1
+precious|vērtīgs|B1
+private|privāts|B1
+professional|profesionāls|B1
+public|publisks|B1
+raw|jēls|B1
+real|īsts|B1
+reasonable|saprātīgs|B1
+regular|regulārs|B1
+relaxed|atslābināts|B1
+reliable|uzticams|B1
+religious|reliģiozs|B1
+remote|attāls|B1
+rough|raupjš|B1
+sensitive|jutīgs|B1
+severe|bargs|B1
+similar|līdzīgs|B1
+single|vienīgs|B1
+slight|neliels|B1
+social|sociāls|B1
+special|īpašs|B1
+specific|specifisks|B1
+steady|stabils|B1
+strange|savāds|B1
+strict|stingrs|B1
+sudden|pēkšņs|B1
+suitable|piemērots|B1
+sweet|salds|B1
+tidy|kārtīgs|B1
+tiny|sīks|B1
+typical|tipisks|B1
+ugly|neglīts|B1
+unable|nespējīgs|B1
+unusual|neparasts|B1
+upper|augšējs|B1
+urgent|steidzams|B1
+useful|noderīgs|B1
+useless|bezjēdzīgs|B1
+usual|ierasts|B1
+various|dažādi|B1
+violent|vardarbīgs|B1
+willing|gatavs|B1
+worth|vērts|B1
+wooden|koka|B1
+yellow|dzeltens|B1
+pink|rozā|B1
+purple|violets|B1
+brown|brūns|B1
+grey|pelēks|B1
+golden|zelta|B1
+absolutely|absolūti|B1
+actually|patiesībā|B1
+anyway|jebkurā gadījumā|B1
+badly|slikti|B1
+barely|tik tikko|B1
+certainly|noteikti|B1
+clearly|skaidri|B1
+completely|pilnīgi|B1
+directly|tieši|B1
+eventually|galu galā|B1
+exactly|tieši tā|B1
+extremely|ārkārtīgi|B1
+fortunately|par laimi|B1
+generally|vispārīgi|B1
+gradually|pakāpeniski|B1
+hardly|diez vai|B1
+immediately|nekavējoties|B1
+instead|tā vietā|B1
+mainly|galvenokārt|B1
+meanwhile|tikmēr|B1
+mostly|pārsvarā|B1
+obviously|acīmredzami|B1
+otherwise|pretējā gadījumā|B1
+partly|daļēji|B1
+perfectly|ideāli|B1
+properly|pienācīgi|B1
+quickly|ātri|B1
+rarely|reti|B1
+recently|nesen|B1
+seriously|nopietni|B1
+shortly|drīz|B1
+slightly|nedaudz|B1
+suddenly|pēkšņi|B1
+therefore|tāpēc|B1
+thus|tādējādi|B1
+truly|patiesi|B1
+usually|parasti|B1
+access|piekļuve|B1
+account|konts|B1
+achievement|sasniegums|B1
+action|rīcība|B1
+activity|aktivitāte|B1
+address|adrese|B1
+advertisement|reklāma|B1
+agreement|vienošanās|B1
+amount|daudzums|B1
+ambition|ambīcija|B1
+animal|dzīvnieks|B1
+application|pieteikums|B1
+argument|strīds|B1
+army|armija|B1
+arrival|ierašanās|B1
+article|raksts|B1
+artist|mākslinieks|B1
+audience|auditorija|B1
+author|autors|B1
+average|vidējais|B1
+award|balva|B1
+bank|banka|B1
+battle|kauja|B1
+beach|pludmale|B1
+beginning|sākums|B1
+behaviour|uzvedība|B1
+birth|dzimšana|B1
+border|robeža|B1
+brand|zīmols|B1
+budget|budžets|B1
+business|bizness|B1
+campaign|kampaņa|B1
+candidate|kandidāts|B1
+capital|galvaspilsēta|B1
+career|karjera|B1
+century|gadsimts|B1
+chance|izdevība|B1
+character|raksturs|B1
+charity|labdarība|B1
+choice|izvēle|B1
+citizen|pilsonis|B1
+climate|klimats|B1
+club|klubs|B1
+colleague|kolēģis|B1
+comment|komentārs|B1
+community|kopiena|B1
+company|uzņēmums|B1
+competition|konkurence|B1
+condition|stāvoklis|B1
+conference|konference|B1
+connection|savienojums|B1
+consequence|sekas|B1
+contact|kontakts|B1
+contract|līgums|B1
+conversation|saruna|B1
+cost|izmaksas|B1
+council|padome|B1
+country|valsts|B1
+countryside|lauki|B1
+couple|pāris|B1
+court|tiesa|B1
+crime|noziegums|B1
+crowd|pūlis|B1
+culture|kultūra|B1
+currency|valūta|B1
+danger|briesmas|B1
+data|dati|B1
+date|datums|B1
+debt|parāds|B1
+decision|lēmums|B1
+degree|grāds|B1
+demand|pieprasījums|B1
+department|nodaļa|B1
+description|apraksts|B1
+design|dizains|B1
+detail|detaļa|B1
+difference|atšķirība|B1
+direction|virziens|B1
+director|direktors|B1
+disaster|katastrofe|B1
+discussion|diskusija|B1
+disease|slimība|B1
+distance|attālums|B1
+document|dokuments|B1
+drug|narkotika|B1
+earth|zeme|B1
+economy|ekonomika|B1
+education|izglītība|B1
+effect|efekts|B1
+election|vēlēšanas|B1
+emergency|ārkārtas situācija|B1
+emotion|emocija|B1
+employee|darbinieks|B1
+employer|darba devējs|B1
+energy|enerģija|B1
+engineer|inženieris|B1
+entrance|ieeja|B1
+equipment|aprīkojums|B1
+event|notikums|B1
+evidence|pierādījums|B1
+exchange|apmaiņa|B1
+exhibition|izstāde|B1
+exit|izeja|B1
+expense|izdevumi|B1
+expert|eksperts|B1
+factory|rūpnīca|B1
+fact|fakts|B1
+failure|neveiksme|B1
+fear|bailes|B1
+feature|iezīme|B1
+fee|nodeva|B1
+field|lauks|B1
+figure|skaitlis|B1
+flight|lidojums|B1
+flood|plūdi|B1
+forest|mežs|B1
+form|veidlapa|B1
+foundation|pamats|B1
+freedom|brīvība|B1
+fuel|degviela|B1
+fun|jautrība|B1
+function|funkcija|B1
+fund|fonds|B1
+gap|sprauga|B1
+goal|mērķis|B1
+government|valdība|B1
+grade|atzīme|B1
+group|grupa|B1
+growth|izaugsme|B1
+guest|viesis|B1
+habit|ieradums|B1
+harbour|osta|B1
+hero|varonis|B1
+history|vēsture|B1
+hobby|vaļasprieks|B1
+honour|gods|B1
+host|saimnieks|B1
+housing|mājoklis|B1
+human|cilvēks|B1
+image|attēls|B1
+income|ienākumi|B1
+industry|rūpniecība|B1
+information|informācija|B1
+insect|kukainis|B1
+instruction|norādījums|B1
+instrument|instruments|B1
+interest|interese|B1
+island|sala|B1
+issue|aktuāls jautājums|B1
+item|priekšmets|B1
+journalist|žurnālists|B1
+justice|taisnīgums|B1
+labour|darbaspēks|B1
+lack|trūkums|B1
+language|valoda|B1
+law|likums|B1
+lawyer|jurists|B1
+layer|slānis|B1
+leader|līderis|B1
+level|līmenis|B1
+licence|licence|B1
+lifestyle|dzīvesveids|B1
+limit|ierobežojums|B1
+list|saraksts|B1
+loan|aizdevums|B1
+location|atrašanās vieta|B1
+loss|zaudējums|B1
+luck|veiksme|B1
+machine|mašīna|B1
+manager|menedžeris|B1
+manner|veids|B1
+material|materiāls|B1
+meaning|nozīme|B1
+media|plašsaziņas līdzekļi|B1
+member|biedrs|B1
+memory|atmiņa|B1
+method|metode|B1
+middle|vidus|B1
+mind|prāts|B1
+minister|ministrs|B1
+minority|minoritāte|B1
+mood|garastāvoklis|B1
+mountain|kalns|B1
+movement|kustība|B1
+museum|muzejs|B1
+nation|tauta|B1
+nature|daba|B1
+network|tīkls|B1
+news|ziņas|B1
+noise|troksnis|B1
+note|piezīme|B1
+number|numurs|B1
+object|objekts|B1
+occasion|gadījums|B1
+officer|virsnieks|B1
+option|izvēles iespēja|B1
+organisation|organizācija|B1
+owner|īpašnieks|B1
+parent|vecāks|B1
+partner|partneris|B1
+party|ballīte|B1
+pattern|paraugs|B1
+payment|maksājums|B1
+peace|miers|B1
+period|periods|B1
+permission|atļauja|B1
+person|persona|B1
+personality|personība|B1
+pilot|pilots|B1
+place|vieta|B1
+plan|plāns|B1
+plant|augs|B1
+plastic|plastmasa|B1
+plenty|pārpilnība|B1
+poem|dzejolis|B1
+poet|dzejnieks|B1
+point|punkts|B1
+police|policija|B1
+policy|politika|B1
+politician|politiķis|B1
+pollution|piesārņojums|B1
+population|iedzīvotāji|B1
+position|amats|B1
+power|vara|B1
+practice|prakse|B1
+pressure|spiediens|B1
+prison|cietums|B1
+prize|godalga|B1
+problem|problēma|B1
+process|process|B1
+product|produkts|B1
+profession|profesija|B1
+profit|peļņa|B1
+programme|programma|B1
+progress|progress|B1
+project|projekts|B1
+property|īpašums|B1
+protest|protests|B1
+purpose|nolūks|B1
+quality|kvalitāte|B1
+question|jautājums|B1
+rate|likme|B1
+reaction|reakcija|B1
+reason|iemesls|B1
+record|ieraksts|B1
+region|reģions|B1
+republic|republika|B1
+reputation|reputācija|B1
+resource|resurss|B1
+rule|noteikums|B1
+safety|drošība|B1
+sample|paraugs|B1
+scene|aina|B1
+schedule|grafiks|B1
+science|zinātne|B1
+scientist|zinātnieks|B1
+section|sadaļa|B1
+sector|sektors|B1
+security|aizsardzība|B1
+series|sērija|B1
+service|pakalpojums|B1
+shape|forma|B1
+society|sabiedrība|B1
+soldier|karavīrs|B1
+solution|risinājums|B1
+source|avots|B1
+space|telpa|B1
+species|suga|B1
+speech|runa|B1
+sport|sports|B1
+staff|personāls|B1
+stage|posms|B1
+standard|standarts|B1
+statement|paziņojums|B1
+status|statuss|B1
+step|solis|B1
+stock|krājums|B1
+story|stāsts|B1
+strategy|stratēģija|B1
+strength|stiprums|B1
+structure|struktūra|B1
+style|stils|B1
+success|panākumi|B1
+summary|kopsavilkums|B1
+surface|virsma|B1
+survey|aptauja|B1
+system|sistēma|B1
+talent|talants|B1
+task|uzdevums|B1
+tax|nodoklis|B1
+technology|tehnoloģija|B1
+theatre|teātris|B1
+theory|teorija|B1
+tool|rīks|B1
+topic|temats|B1
+tourist|tūrists|B1
+tradition|tradīcija|B1
+training|apmācība|B1
+trip|brauciens|B1
+truth|patiesība|B1
+unit|vienība|B1
+value|vērtība|B1
+variety|dažādība|B1
+version|versija|B1
+victim|upuris|B1
+view|skats|B1
+village|ciems|B1
+virus|vīruss|B1
+volume|apjoms|B1
+wage|darba alga|B1
+war|karš|B1
+wealth|bagātība|B1
+wedding|kāzas|B1
+weight|svars|B1
+width|platums|B1
+witness|liecinieks|B1
+worker|strādnieks|B1
+world|pasaule|B1
+youth|jaunatne|B1
+despite|neskatoties uz|B1
+instead of|tā vietā, lai|B1
+according to|saskaņā ar|B1
+as well as|kā arī|B1
+in order to|lai|B1
+so that|lai|B1
+unless|ja vien nav|B1
+whether|vai nu|B1
+as soon as|tiklīdz|B1
+as long as|ja vien|B1
+in case|gadījumā, ja|B1
+on the other hand|no otras puses|B1
+in fact|faktiski|B1
+for example|piemēram|B1
+in addition|turklāt|B1
+as a result|rezultātā|B1
+in spite of|par spīti|B1
+apart from|izņemot|B1
+such as|tādi kā|B1
+by the way|starp citu|B1
+at least|vismaz|B1
+at all|vispār|B1
+of course|protams|B1
+no longer|vairs ne|B1
+so far|līdz šim|B1
+as if|itkā|B1
+rather than|nevis|B1
+regardless|neatkarīgi|B1
+whenever|kad vien|B1
+wherever|kur vien|B1
+whatever|lai kas|B1
+nevertheless|tomēr|B1
+furthermore|vēl jo vairāk|B1
+afterwards|pēc tam|B1
+beforehand|iepriekš|B1
+besides|bez tam|B1
+abandon|pamest|B2
+absorb|uzsūkt|B2
+accompany|pavadīt|B2
+accomplish|paveikt|B2
+accumulate|uzkrāt|B2
+accuse|apsūdzēt|B2
+adapt|pielāgoties|B2
+adjust|pielāgot|B2
+adopt|adoptēt|B2
+advance|virzīties uz priekšu|B2
+advertise|reklamēt|B2
+affect|ietekmēt|B2
+aim|mērķēt|B2
+allocate|piešķirt|B2
+analyse|analizēt|B2
+anticipate|paredzēt|B2
+appeal|pievilkt|B2
+appreciate|novērtēt|B2
+approach|tuvoties|B2
+argue|strīdēties|B2
+arise|rasties|B2
+assemble|salikt|B2
+assess|izvērtēt|B2
+assign|norīkot|B2
+assume|pieņemt par|B2
+attend|piedalīties|B2
+attract|piesaistīt|B2
+attribute|piedēvēt|B2
+balance|līdzsvarot|B2
+ban|aizliegt|B2
+bite|kost|B2
+bless|svētīt|B2
+blend|sapludināt|B2
+boast|lielīties|B2
+bounce|atlēkt|B2
+breed|audzēt|B2
+broadcast|pārraidīt|B2
+browse|pārlūkot|B2
+capture|notvert|B2
+cease|pārtraukt|B2
+clarify|noskaidrot|B2
+classify|klasificēt|B2
+cling|pieķerties|B2
+coincide|sakrist|B2
+collapse|sabrukt|B2
+commence|uzsākt|B2
+compete|konkurēt|B2
+compile|sastādīt|B2
+compose|komponēt|B2
+comprise|ietvert|B2
+conceal|noslēpt|B2
+conclude|secināt|B2
+conduct|veikt|B2
+confess|atzīties|B2
+confine|ierobežot|B2
+confront|konfrontēt|B2
+conquer|iekarot|B2
+conserve|saglabāt|B2
+consult|konsultēties|B2
+consume|patērēt|B2
+contribute|sniegt ieguldījumu|B2
+convert|pārveidot|B2
+convey|nodot|B2
+convince|pārliecināt|B2
+cooperate|sadarboties|B2
+crawl|rāpot|B2
+criticise|kritizēt|B2
+cultivate|kultivēt|B2
+cure|izārstēt|B2
+decline|samazināties|B2
+dedicate|veltīt|B2
+defend|aizstāvēt|B2
+define|definēt|B2
+delay|aizkavēt|B2
+delete|dzēst|B2
+demonstrate|demonstrēt|B2
+depart|aizbraukt|B2
+depict|attēlot|B2
+derive|atvasināt|B2
+detect|konstatēt|B2
+determine|noteikt|B2
+differ|atšķirties|B2
+dig|rakt|B2
+disagree|nepiekrist|B2
+disappear|pazust|B2
+discourage|atturēt|B2
+dismiss|atlaist|B2
+display|izstādīt|B2
+dispose|atbrīvoties|B2
+distinguish|atšķirt|B2
+distribute|sadalīt|B2
+dominate|dominēt|B2
+donate|ziedot|B2
+drain|iztukšot|B2
+edit|rediģēt|B2
+elect|ievēlēt|B2
+eliminate|likvidēt|B2
+embrace|apskaut|B2
+emerge|izcelties|B2
+emphasise|uzsvērt|B2
+enable|dot iespēju|B2
+encounter|sastapt|B2
+enforce|piemērot|B2
+enhance|pastiprināt|B2
+ensure|panākt|B2
+entitle|dot tiesības|B2
+equip|aprīkot|B2
+establish|izveidot|B2
+evolve|attīstīties|B2
+exaggerate|pārspīlēt|B2
+exceed|pārsniegt|B2
+exclude|neiekļaut|B2
+exhaust|nogurdināt|B2
+expand|paplašināt|B2
+expose|pakļaut|B2
+extend|pagarināt|B2
+extract|izvilkt|B2
+fade|izbalēt|B2
+flee|bēgt|B2
+flow|plūst|B2
+gaze|raudzīties|B2
+generate|ģenerēt|B2
+grab|sakampt|B2
+greet|sveikt|B2
+grind|malt|B2
+hesitate|vilcināties|B2
+highlight|izcelt|B2
+hint|mājināt|B2
+illustrate|ilustrēt|B2
+imitate|atdarināt|B2
+implement|īstenot|B2
+impose|uzlikt|B2
+inherit|mantot|B2
+inspire|iedvesmot|B2
+interpret|interpretēt|B2
+invest|investēt|B2
+investigate|izpētīt|B2
+justify|attaisnot|B2
+launch|laist klajā|B2
+lean|noliekties|B2
+mislead|maldināt|B2
+modify|modificēt|B2
+monitor|uzraudzīt|B2
+motivate|motivēt|B2
+negotiate|vest sarunas|B2
+neglect|nolaist novārtā|B2
+observe|novērot|B2
+occupy|aizņemt|B2
+occur|gadīties|B2
+organise|organizēt|B2
+participate|piedalīties|B2
+perceive|uztvert|B2
+postpone|atlikt|B2
+predict|prognozēt|B2
+proceed|virzīties tālāk|B2
+promote|veicināt|B2
+propose|ierosināt|B2
+pursue|tiekties|B2
+react|reaģēt|B2
+recall|atsaukt atmiņā|B2
+receive|saņemt|B2
+recognise|atpazīt|B2
+reflect|atspoguļot|B2
+register|reģistrēt|B2
+regret|nožēlot|B2
+release|atbrīvot|B2
+relieve|atvieglot|B2
+rent|īrēt|B2
+repeat|atkārtot|B2
+represent|pārstāvēt|B2
+resign|atkāpties no amata|B2
+resist|pretoties|B2
+respect|cienīt|B2
+restore|atjaunot|B2
+reverse|apgriezt|B2
+revise|pārstrādāt|B2
+reward|atalgot|B2
+scatter|izkaisīt|B2
+shift|pārvietot|B2
+shrink|saraukties|B2
+sigh|nopūsties|B2
+signal|signalizēt|B2
+slide|slīdēt|B2
+smash|sasist|B2
+spoil|sabojāt|B2
+stare|blenzt|B2
+store|uzglabāt|B2
+struggle|cīnīties|B2
+submit|iesniegt|B2
+subscribe|abonēt|B2
+summarise|rezumēt|B2
+supervise|pārraudzīt|B2
+supplement|papildināt|B2
+surrender|kapitulēt|B2
+surround|ieskaut|B2
+sustain|uzturēt|B2
+tackle|risināt|B2
+tempt|kārdināt|B2
+threaten|draudēt|B2
+tolerate|panest|B2
+trace|izsekot|B2
+transfer|pārsūtīt|B2
+transform|pārvērst|B2
+transport|pārvadāt|B2
+trigger|iedarbināt|B2
+undergo|piedzīvot|B2
+undertake|uzņemties|B2
+update|atjaunināt|B2
+upgrade|jaunināt|B2
+urge|mudināt|B2
+utilise|izmantot|B2
+verify|verificēt|B2
+vary|mainīties|B2
+volunteer|brīvprātīgi pieteikties|B2
+wander|klaiņot|B2
+withdraw|izņemt|B2
+worship|pielūgt|B2
+abstract|abstrakts|B2
+academic|akadēmisks|B2
+adequate|pietiekams|B2
+aggressive|agresīvs|B2
+alert|modrs|B2
+ancient|sens|B2
+annoying|kaitinošs|B2
+anxious|nemierīgs|B2
+appropriate|atbilstošs|B2
+artificial|mākslīgs|B2
+ashamed|apkaunots|B2
+automatic|automātisks|B2
+awful|šausmīgs|B2
+awkward|neveikls|B2
+bitter|rūgts|B2
+capable|spējīgs|B2
+careless|neuzmanīgs|B2
+casual|ikdienišķs|B2
+cautious|piesardzīgs|B2
+chief|galvenais|B2
+classic|klasisks|B2
+comfortable|komfortabls|B2
+comparable|salīdzināms|B2
+competent|kompetents|B2
+complex|komplekss|B2
+comprehensive|visaptverošs|B2
+compulsory|obligāts|B2
+conservative|konservatīvs|B2
+considerable|ievērojams|B2
+consistent|konsekvents|B2
+constant|pastāvīgs|B2
+contemporary|laikmetīgs|B2
+controversial|pretrunīgs|B2
+cruel|cietsirdīgs|B2
+deliberate|apzināts|B2
+dense|blīvs|B2
+dependent|atkarīgs|B2
+destructive|postošs|B2
+determined|apņēmīgs|B2
+digital|digitāls|B2
+diplomatic|diplomātisks|B2
+distinct|skaidri atšķirams|B2
+domestic|iekšzemes|B2
+dramatic|dramatisks|B2
+dull|blāvs|B2
+eastern|austrumu|B2
+western|rietumu|B2
+northern|ziemeļu|B2
+southern|dienvidu|B2
+economic|ekonomisks|B2
+effective|efektīvs|B2
+efficient|lietderīgs|B2
+elderly|vecāka gadagājuma|B2
+emotional|emocionāls|B2
+environmental|vides|B2
+ethical|ētisks|B2
+evident|redzams|B2
+excellent|teicams|B2
+exclusive|ekskluzīvs|B2
+exotic|eksotisks|B2
+external|ārējs|B2
+extraordinary|ārkārtējs|B2
+faithful|uzticīgs|B2
+fierce|nikns|B2
+financial|finansiāls|B2
+flexible|elastīgs|B2
+fond|mīlošs|B2
+fragile|trausls|B2
+frequent|biežs|B2
+fundamental|fundamentāls|B2
+glad|priecīgs|B2
+harsh|skarbs|B2
+hidden|apslēpts|B2
+hollow|dobs|B2
+hostile|naidīgs|B2
+humble|pazemīgs|B2
+humorous|humoristisks|B2
+ignorant|nezinošs|B2
+imaginary|iedomāts|B2
+impatient|nepacietīgs|B2
+impressive|iespaidīgs|B2
+inadequate|nepietiekams|B2
+indirect|netiešs|B2
+inevitable|neizbēgams|B2
+infinite|bezgalīgs|B2
+initial|sākotnējs|B2
+innovative|inovatīvs|B2
+insane|neprātīgs|B2
+intense|intensīvs|B2
+junior|jaunākais|B2
+lengthy|ilgstošs|B2
+liberal|liberāls|B2
+literary|literārs|B2
+lively|dzīvīgs|B2
+logical|loģisks|B2
+magnificent|lielisks|B2
+massive|masīvs|B2
+mature|nobriedis|B2
+minor|nenozīmīgs|B2
+miserable|nelaimīgs|B2
+moral|morāls|B2
+mutual|savstarpējs|B2
+naked|kails|B2
+negative|negatīvs|B2
+positive|pozitīvs|B2
+neutral|neitrāls|B2
+noble|cēls|B2
+numerous|daudzskaitlīgs|B2
+obedient|paklausīgs|B2
+objective|objektīvs|B2
+obscure|neskaidrs|B2
+offensive|aizvainojošs|B2
+optimistic|optimistisks|B2
+pessimistic|pesimistisks|B2
+outstanding|izcils|B2
+overall|kopējais|B2
+overseas|aizjūras|B2
+parallel|paralēls|B2
+partial|daļējs|B2
+passionate|kaislīgs|B2
+peaceful|miermīlīgs|B2
+temporary|pagaidu|B2
+persistent|neatlaidīgs|B2
+potential|potenciāls|B2
+productive|produktīvs|B2
+profound|dziļdomīgs|B2
+proper|pienācīgs|B2
+protective|aizsargājošs|B2
+psychological|psiholoģisks|B2
+radical|radikāls|B2
+random|nejaušs|B2
+rapid|straujš|B2
+rare|rets|B2
+rational|racionāls|B2
+realistic|reālistisks|B2
+reckless|pārgalvīgs|B2
+regional|reģionāls|B2
+relevant|atbilstošs|B2
+reluctant|negribīgs|B2
+remarkable|ievērības cienīgs|B2
+reserved|atturīgs|B2
+respectable|cienījams|B2
+ridiculous|absurds|B2
+romantic|romantisks|B2
+rural|lauku|B2
+sacred|svēts|B2
+scientific|zinātnisks|B2
+secondary|otršķirīgs|B2
+secret|slepens|B2
+selfish|savtīgs|B2
+senior|vecākais|B2
+shocking|šokējošs|B2
+significant|nozīmīgs|B2
+sincere|sirsnīgs|B2
+skilled|prasmīgs|B2
+solar|saules|B2
+sophisticated|izsmalcināts|B2
+spare|rezerves|B2
+stiff|stīvs|B2
+stressful|stresa pilns|B2
+subtle|smalks|B2
+superior|pārāks|B2
+supportive|atbalstošs|B2
+surprising|pārsteidzošs|B2
+suspicious|aizdomīgs|B2
+tense|sasprindzināts|B2
+thorough|rūpīgs|B2
+tough|izturīgs|B2
+traditional|tradicionāls|B2
+tragic|traģisks|B2
+transparent|caurspīdīgs|B2
+ultimate|galējais|B2
+unconscious|bezsamaņā|B2
+underlying|pamatā esošs|B2
+unemployed|bez darba|B2
+unexpected|negaidīts|B2
+unfair|netaisns|B2
+unique|unikāls|B2
+universal|universāls|B2
+unknown|nezināms|B2
+unlikely|maz ticams|B2
+unnecessary|nevajadzīgs|B2
+unpleasant|nepatīkams|B2
+urban|pilsētas|B2
+valid|derīgs|B2
+vast|plašs|B2
+visual|vizuāls|B2
+vulnerable|neaizsargāts|B2
+wicked|ļauns|B2
+wild|savvaļas|B2
+widespread|plaši izplatīts|B2
+worldwide|vispasaules|B2
+worthy|cienīgs|B2
+youthful|jauneklīgs|B2
+abuse|vardarbība|B2
+accommodation|izmitināšana|B2
+accuracy|precizitāte|B2
+advantage|priekšrocība|B2
+disadvantage|nelabvēlīgs stāvoklis|B2
+agency|aģentūra|B2
+agenda|darba kārtība|B2
+alliance|alianse|B2
+alternative|alternatīva|B2
+analysis|analīze|B2
+ancestor|sencis|B2
+anger|dusmas|B2
+anxiety|trauksme|B2
+appearance|izskats|B2
+architect|arhitekts|B2
+archive|arhīvs|B2
+arrest|arests|B2
+assembly|asambleja|B2
+assessment|novērtējums|B2
+asset|aktīvs|B2
+assistance|palīdzība|B2
+assumption|pieņēmums|B2
+atmosphere|atmosfēra|B2
+attempt|mēģinājums|B2
+attention|uzmanība|B2
+authority|iestāde|B2
+awareness|izpratne|B2
+background|fons|B2
+barrier|šķērslis|B2
+belief|pārliecība|B2
+bias|aizspriedums|B2
+breakdown|sabrukums|B2
+breakthrough|izrāviens|B2
+burden|slogs|B2
+capacity|ietilpība|B2
+category|kategorija|B2
+ceremony|ceremonija|B2
+channel|kanāls|B2
+chapter|nodaļa|B2
+characteristic|īpašība|B2
+circumstance|apstāklis|B2
+claim|apgalvojums|B2
+clue|pavediens|B2
+code|kods|B2
+collection|kolekcija|B2
+combination|kombinācija|B2
+comfort|komforts|B2
+commitment|apņemšanās|B2
+committee|komiteja|B2
+communication|komunikācija|B2
+comparison|salīdzinājums|B2
+complaint|sūdzība|B2
+concept|koncepts|B2
+concern|bažas|B2
+conclusion|secinājums|B2
+confidence|pašpārliecinātība|B2
+conflict|konflikts|B2
+consciousness|apziņa|B2
+consensus|vienprātība|B2
+construction|būvniecība|B2
+consumer|patērētājs|B2
+context|konteksts|B2
+contrast|kontrasts|B2
+contribution|ieguldījums|B2
+convention|konvencija|B2
+corporation|korporācija|B2
+crisis|krīze|B2
+criterion|kritērijs|B2
+critic|kritiķis|B2
+criticism|kritika|B2
+curiosity|ziņkāre|B2
+custom|paraža|B2
+debate|debates|B2
+decade|desmitgade|B2
+definition|definīcija|B2
+democracy|demokrātija|B2
+dilemma|dilemma|B2
+diversity|daudzveidība|B2
+drama|drāma|B2
+duty|pienākums|B2
+editor|redaktors|B2
+efficiency|efektivitāte|B2
+element|elements|B2
+emphasis|uzsvars|B2
+enemy|ienaidnieks|B2
+enterprise|uzņēmējdarbība|B2
+enthusiasm|entuziasms|B2
+episode|epizode|B2
+essence|būtība|B2
+estate|nekustamais īpašums|B2
+ethics|ētika|B2
+evolution|evolūcija|B2
+examination|pārbaude|B2
+excitement|satraukums|B2
+expansion|paplašināšanās|B2
+expectation|cerība|B2
+explanation|skaidrojums|B2
+exposure|pakļaušana|B2
+extension|pagarinājums|B2
+extent|apmērs|B2
+faith|ticība|B2
+fame|slava|B2
+fashion|mode|B2
+fault|vaina|B2
+favour|labvēlība|B2
+federation|federācija|B2
+feedback|atsauksmes|B2
+fiction|daiļliteratūra|B2
+finance|finanses|B2
+flavour|garša|B2
+focus|fokuss|B2
+formula|formula|B2
+framework|ietvars|B2
+friendship|draudzība|B2
+frustration|neapmierinātība|B2
+generation|paaudze|B2
+genre|žanrs|B2
+gesture|žests|B2
+glance|skatiens|B2
+globe|globuss|B2
+grief|bēdas|B2
+guarantee|galvojums|B2
+guidance|vadība|B2
+guideline|vadlīnijas|B2
+harm|kaitējums|B2
+headline|virsraksts|B2
+heritage|mantojums|B2
+hierarchy|hierarhija|B2
+horizon|apvārsnis|B2
+hypothesis|hipotēze|B2
+identity|identitāte|B2
+ideology|ideoloģija|B2
+illusion|ilūzija|B2
+immigration|imigrācija|B2
+incentive|stimuls|B2
+incident|incidents|B2
+index|rādītājs|B2
+infrastructure|infrastruktūra|B2
+ingredient|sastāvdaļa|B2
+initiative|iniciatīva|B2
+insight|ieskats|B2
+inspection|inspekcija|B2
+institution|institūcija|B2
+integrity|godprātība|B2
+intention|nodoms|B2
+interaction|mijiedarbība|B2
+interface|saskarne|B2
+interference|iejaukšanās|B2
+interpretation|interpretācija|B2
+invention|izgudrojums|B2
+investigation|izmeklēšana|B2
+investment|investīcija|B2
+involvement|iesaiste|B2
+irony|ironija|B2
+jury|žūrija|B2
+landscape|ainava|B2
+legislation|likumdošana|B2
+liability|atbildība|B2
+lifetime|mūžs|B2
+likelihood|iespējamība|B2
+literature|literatūra|B2
+logic|loģika|B2
+majority|vairākums|B2
+margin|mala|B2
+mass|masa|B2
+mechanism|mehānisms|B2
+memorial|piemineklis|B2
+mentality|mentalitāte|B2
+merit|nopelns|B2
+mess|nekārtība|B2
+metaphor|metafora|B2
+migration|migrācija|B2
+mission|misija|B2
+mixture|maisījums|B2
+monopoly|monopols|B2
+motive|motīvs|B2
+motivation|motivācija|B2
+narrative|stāstījums|B2
+negotiation|pārrunas|B2
+norm|norma|B2
+notion|priekšstats|B2
+obligation|saistība|B2
+observation|novērojums|B2
+offence|pārkāpums|B2
+opponent|pretinieks|B2
+opposition|opozīcija|B2
+origin|izcelsme|B2
+outcome|iznākums|B2
+output|izlaide|B2
+outline|kontūra|B2
+overview|pārskats|B2
+ownership|īpašumtiesības|B2
+parliament|parlaments|B2
+participant|dalībnieks|B2
+partnership|partnerība|B2
+passion|kaisle|B2
+penalty|sods|B2
+perception|uztvere|B2
+performance|izrāde|B2
+perspective|perspektīva|B2
+phase|fāze|B2
+phenomenon|parādība|B2
+philosophy|filozofija|B2
+pioneer|pionieris|B2
+platform|platforma|B2
+plot|sižets|B2
+portion|porcija|B2
+portrait|portrets|B2
+possession|valdījums|B2
+poverty|nabadzība|B2
+precedent|precedents|B2
+premise|premisa|B2
+presence|klātbūtne|B2
+priority|prioritāte|B2
+privacy|privātums|B2
+privilege|privilēģija|B2
+procedure|procedūra|B2
+proposal|priekšlikums|B2
+prospect|izredzes|B2
+provision|nodrošinājums|B2
+publication|publikācija|B2
+publicity|publicitāte|B2
+pursuit|tiekšanās|B2
+quota|kvota|B2
+radiation|starojums|B2
+range|diapazons|B2
+ratio|attiecība|B2
+reality|realitāte|B2
+reasoning|argumentācija|B2
+rebellion|sacelšanās|B2
+recession|recesija|B2
+recovery|atveseļošanās|B2
+reference|atsauce|B2
+reform|reforma|B2
+refugee|bēglis|B2
+regime|režīms|B2
+regulation|noteikumi|B2
+relief|atvieglojums|B2
+reliability|uzticamība|B2
+remark|piebilde|B2
+remedy|līdzeklis|B2
+representation|pārstāvība|B2
+representative|pārstāvis|B2
+requirement|prasība|B2
+resolution|rezolūcija|B2
+resort|kūrorts|B2
+retail|mazumtirdzniecība|B2
+revenue|ieņēmumi|B2
+revolution|revolūcija|B2
+rhythm|ritms|B2
+ritual|rituāls|B2
+rival|sāncensis|B2
+routine|ikdienas kārtība|B2
+sacrifice|upurēšanās|B2
+scale|mērogs|B2
+scandal|skandāls|B2
+scenario|scenārijs|B2
+scheme|shēma|B2
+sequence|secība|B2
+shelter|pajumte|B2
+shortage|deficīts|B2
+sibling|brālis vai māsa|B2
+simulation|simulācija|B2
+skill|prasme|B2
+slogan|sauklis|B2
+solidarity|solidaritāte|B2
+specialist|speciālists|B2
+spectrum|spektrs|B2
+spirit|gars|B2
+stability|stabilitāte|B2
+stereotype|stereotips|B2
+strain|spriedze|B2
+stress|stress|B2
+stroke|insults|B2
+subsidy|subsīdija|B2
+suburb|piepilsēta|B2
+supporter|atbalstītājs|B2
+suspicion|aizdomas|B2
+symbol|simbols|B2
+sympathy|līdzjūtība|B2
+tendency|tieksme|B2
+tension|saspīlējums|B2
+territory|teritorija|B2
+terror|terors|B2
+texture|tekstūra|B2
+threat|drauds|B2
+tide|plūdmaiņa|B2
+timing|laika izvēle|B2
+tissue|audi|B2
+tone|tonis|B2
+tournament|turnīrs|B2
+trade|tirdzniecība|B2
+trend|tendence|B2
+transaction|darījums|B2
+transition|pāreja|B2
+transmission|pārraide|B2
+treasure|dārgums|B2
+treaty|nolīgums|B2
+tribe|cilts|B2
+tribute|veltījums|B2
+tutor|privātskolotājs|B2
+uncertainty|nenoteiktība|B2
+union|savienība|B2
+universe|visums|B2
+urgency|steidzamība|B2
+utility|komunālais pakalpojums|B2
+validity|derīgums|B2
+variable|mainīgais|B2
+vehicle|transportlīdzeklis|B2
+venture|uzņēmšanās|B2
+vision|redzējums|B2
+vitality|dzīvotspēja|B2
+warning|brīdinājums|B2
+welfare|labklājība|B2
+willingness|gatavība|B2
+wisdom|gudrība|B2
+workshop|darbnīca|B2
+zone|zona|B2
+mortgage|hipotēka|B2
+pension|pensija|B2
+tenant|īrnieks|B2
+landlord|saimnieks|B2
+neighbourhood|apkaime|B2
+commuter|ikdienas braucējs|B2
+queue|rinda|B2
+deposit|iemaksa|B2
+shipment|sūtījums|B2
+supplier|piegādātājs|B2
+inventory|inventārs|B2
+overtime|virsstundas|B2
+promotion|paaugstinājums|B2
+resignation|atkāpšanās|B2
+vacancy|vakance|B2
+interview|intervija|B2
+internship|prakse|B2
+negotiable|sarunājams|B2
+workload|darba slodze|B2
+teamwork|komandas darbs|B2
+recipe|recepte|B2
+slice|šķēle|B2
+fry|cept pannā|B2
+roast|cept krāsnī|B2
+grill|grilēt|B2
+chop|sakapāt|B2
+peel|mizot|B2
+taste|nogaršot|B2
+spicy|pikants|B2
+sour|skābs|B2
+salty|sāļš|B2
+frozen|saldēts|B2
+canned|konservēts|B2
+leftovers|pārpalikumi|B2
+snack|uzkoda|B2
+dessert|deserts|B2
+flour|milti|B2
+honey|medus|B2
+jam|ievārījums|B2
+cream|krējums|B2
+yoghurt|jogurts|B2
+mushroom|sēne|B2
+cucumber|gurķis|B2
+cabbage|kāposti|B2
+garlic|ķiploks|B2
+nut|rieksts|B2
+bean|pupa|B2
+peach|persiks|B2
+pear|bumbieris|B2
+grape|vīnoga|B2
+cherry|ķirsis|B2
+berry|oga|B2
+plum|plūme|B2
+herb|garšaugs|B2
+frying pan|panna|B2
+pot|katls|B2
+kettle|tējkanna|B2
+microwave|mikroviļņu krāsns|B2
+dishwasher|trauku mazgājamā mašīna|B2
+washing machine|veļas mašīna|B2
+vacuum cleaner|putekļsūcējs|B2
+iron|gludeklis|B2
+broom|slota|B2
+bucket|spainis|B2
+ladder|trepes|B2
+hammer|āmurs|B2
+screw|skrūve|B2
+nail|nagla|B2
+drill|urbjmašīna|B2
+brush|suka|B2
+tape|līmlente|B2
+glue|līme|B2
+rope|virve|B2
+battery|baterija|B2
+charger|lādētājs|B2
+plug|kontaktdakša|B2
+socket|rozete|B2
+cable|kabelis|B2
+bulb|spuldze|B2
+app|lietotne|B2
+download|lejupielādēt|B2
+upload|augšupielādēt|B2
+click|klikšķināt|B2
+search engine|meklētājprogramma|B2
+browser|pārlūks|B2
+attachment|pielikums|B2
+folder|mape|B2
+software|programmatūra|B2
+hardware|aparatūra|B2
+backup|dublējums|B2
+log in|pieslēgties|B2
+log out|atslēgties|B2
+sign up|reģistrēties|B2
+wireless|bezvadu|B2
+device|ierīce|B2
+smartphone|viedtālrunis|B2
+tablet|planšetdators|B2
+headphones|austiņas|B2
+speaker|skaļrunis|B2
+microphone|mikrofons|B2
+printer|printeris|B2
+scanner|skeneris|B2
+laptop|portatīvais dators|B2
+flash drive|zibatmiņa|B2
+spreadsheet|izklājlapa|B2
+database|datubāze|B2
+algorithm|algoritms|B2
+artificial intelligence|mākslīgais intelekts|B2
+automation|automatizācija|B2
+suitcase|čemodāns|B2
+backpack|mugursoma|B2
+visa|vīza|B2
+customs|muita|B2
+departure|izlidošana|B2
+destination|galamērķis|B2
+boarding|iekāpšana|B2
+seat|sēdvieta|B2
+aisle|eja|B2
+gate|vārti|B2
+one-way|vienvirziena|B2
+return ticket|biļete turp un atpakaļ|B2
+booking|rezervācija|B2
+reception|reģistratūra|B2
+hostel|hostelis|B2
+hotel|viesnīca|B2
+tent|telts|B2
+campsite|kempings|B2
+sightseeing|apskates vietas|B2
+souvenir|suvenīrs|B2
+guidebook|ceļvedis|B2
+exchange rate|valūtas kurss|B2
+ferry|prāmis|B2
+coast|piekraste|B2
+lake|ezers|B2
+river|upe|B2
+valley|ieleja|B2
+hill|pakalns|B2
+cliff|klints|B2
+cave|ala|B2
+desert|tuksnesis|B2
+jungle|džungļi|B2
+waterfall|ūdenskritums|B2
+sea|jūra|B2
+ocean|okeāns|B2
+wave|vilnis|B2
+sand|smiltis|B2
+rock|akmens|B2
+pebble|oļi|B2
+affection|pieķeršanās|B2
+divorce|šķiršanās|B2
+marriage|laulība|B2
+engaged|saderinājies|B2
+boyfriend|puisis|B2
+girlfriend|draudzene|B2
+husband|vīrs|B2
+wife|sieva|B2
+relative|radinieks|B2
+grandmother|vecmāmiņa|B2
+grandfather|vectēvs|B2
+uncle|onkulis|B2
+aunt|tante|B2
+cousin|brālēns|B2
+nephew|brāļadēls|B2
+niece|brāļameita|B2
+twin|dvīnis|B2
+baby|mazulis|B2
+teenager|pusaudzis|B2
+adult|pieaugušais|B2
+pregnant|stāvoklī|B2
+hug|apskāviens|B2
+painting|glezna|B2
+drawing|zīmējums|B2
+gardening|dārzkopība|B2
+fishing|makšķerēšana|B2
+hiking|pārgājiens|B2
+cycling|riteņbraukšana|B2
+swimming|peldēšana|B2
+running|skriešana|B2
+gym|sporta zāle|B2
+exercise|vingrinājums|B2
+workout|treniņš|B2
+yoga|joga|B2
+football|futbols|B2
+basketball|basketbols|B2
+tennis|teniss|B2
+skiing|slēpošana|B2
+skating|slidošana|B2
+chess|šahs|B2
+cards|spēļu kārtis|B2
+puzzle|puzle|B2
+concert|koncerts|B2
+festival|festivāls|B2
+cinema|kinoteātris|B2
+gallery|galerija|B2
+novel|romāns|B2
+comedy|komēdija|B2
+horror|šausmu filma|B2
+documentary|dokumentālā filma|B2
+TV series|seriāls|B2
+unemployment|bezdarbs|B2
+benefits|pabalsti|B2
+trade union|arodbiedrība|B2
+strike|streiks|B2
+mayor|mērs|B2
+president|prezidents|B2
+prime minister|premjerministrs|B2
+criminal|noziedznieks|B2
+thief|zaglis|B2
+fine|naudas sods|B2
+I'm afraid|diemžēl|B2
+to be honest|godīgi sakot|B2
+as far as I know|cik man zināms|B2
+it depends|tas atkarīgs|B2
+I mean|es domāju|B2
+in my opinion|manuprāt|B2
+I agree|piekrītu|B2
+I disagree|nepiekrītu|B2
+let me think|ļauj man padomāt|B2
+no problem|nekādu problēmu|B2
+never mind|neko darīt|B2
+take your time|nesteidzies|B2
+excuse me|piedodiet|B2
+what do you mean|ko tu domā|B2
+how are you|kā tev klājas|B2
+nice to meet you|prieks iepazīties|B2
+can you repeat that|vai vari atkārtot|B2
+I don't understand|es nesaprotu|B2
+speak more slowly|runā lēnāk|B2
+could you help me|vai varat man palīdzēt|B2
+how much does it cost|cik tas maksā|B2
+where is|kur atrodas|B2
+I would like|es vēlētos|B2
+do you mind|vai tev nav iebildumu|B2
+it's up to you|tas ir tavā ziņā|B2
+I'm not sure|es neesmu pārliecināts|B2
+good luck|veiksmi|B2
+congratulations|apsveicu|B2
+cheers|priekā|B2
+bless you|veselība|B2
+enjoy your meal|labu apetīti|B2
+have a nice day|jauku dienu|B2
+see you later|uz drīzu redzēšanos|B2
+take care|uzmanies|B2
+welcome to|laipni lūdzam|B2
+abolish|atcelt likumu|C1
+accelerate|paātrināt|C1
+accommodate|izmitināt|C1
+acquire|iegūt|C1
+adhere|pieturēties|C1
+advocate|aizstāvēt|C1
+allege|apgalvot|C1
+amend|grozīt|C1
+amplify|pastiprināt|C1
+appoint|iecelt|C1
+articulate|formulēt|C1
+aspire|tiekties pēc|C1
+assert|apgalvot ar pārliecību|C1
+associate|saistīt|C1
+bestow|dāvāt|C1
+boost|veicināt|C1
+circulate|cirkulēt|C1
+comply|ievērot|C1
+concede|piekāpties|C1
+condemn|nosodīt|C1
+confer|piešķirt|C1
+consolidate|nostiprināt|C1
+constitute|veidot|C1
+contemplate|apcerēt|C1
+contradict|runāt pretī|C1
+converge|saplūst|C1
+convict|notiesāt|C1
+correlate|korelēt|C1
+curb|savaldīt|C1
+deduce|secināt loģiski|C1
+deploy|izvietot|C1
+deprive|atņemt|C1
+designate|norādīt|C1
+deteriorate|pasliktināties|C1
+deviate|novirzīties|C1
+devise|izdomāt plānu|C1
+diminish|mazināties|C1
+discard|izmest nost|C1
+disclose|atklāt informāciju|C1
+discriminate|diskriminēt|C1
+dispatch|nosūtīt|C1
+disrupt|izjaukt|C1
+dissolve|izšķīdināt|C1
+distort|izkropļot|C1
+diverge|izšķirties|C1
+elaborate|izstrādāt detalizēti|C1
+embark|uzsākt ceļu|C1
+embed|iestrādāt|C1
+emit|izstarot|C1
+endorse|atbalstīt publiski|C1
+enlighten|apgaismot|C1
+entail|izraisīt sev līdzi|C1
+envisage|paredzēt nākotnē|C1
+erode|erodēt|C1
+evade|izvairīties no|C1
+evoke|raisīt|C1
+exert|pielietot|C1
+exploit|ekspluatēt|C1
+facilitate|atvieglot|C1
+finalise|pabeigt galīgi|C1
+foster|sekmēt|C1
+glorify|slavināt|C1
+govern|pārvaldīt valsti|C1
+halt|apturēt|C1
+harness|izmantot spēku|C1
+hinder|kavēt|C1
+hover|lidināties|C1
+humiliate|pazemot|C1
+hypothesise|izvirzīt hipotēzi|C1
+impair|pasliktināt spējas|C1
+impede|aizkavēt|C1
+implicate|iepīt|C1
+incorporate|iekļaut sastāvā|C1
+induce|izraisīt|C1
+infer|spriest|C1
+inflict|nodarīt|C1
+infringe|pārkāpt tiesības|C1
+inhibit|bremzēt|C1
+inquire|apjautāties|C1
+insert|ievietot|C1
+instigate|musināt|C1
+integrate|integrēt|C1
+interfere|iejaukties|C1
+intervene|iesaistīties|C1
+intrigue|ieintriģēt|C1
+invoke|atsaukties uz|C1
+isolate|izolēt|C1
+jeopardise|apdraudēt|C1
+lament|vaimanāt|C1
+liberate|atbrīvot|C1
+linger|kavēties|C1
+magnify|palielināt|C1
+manifest|izpausties|C1
+manipulate|manipulēt|C1
+mediate|starpniekot|C1
+merge|apvienoties|C1
+mitigate|mīkstināt|C1
+mobilise|mobilizēt|C1
+nominate|nominēt|C1
+nurture|lolot|C1
+obstruct|traucēt kustību|C1
+offset|kompensēt|C1
+overlook|nepamanīt|C1
+overthrow|gāzt|C1
+oversee|pārraudzīt|C1
+perpetuate|iemūžināt|C1
+pledge|solīties|C1
+ponder|pārdomāt|C1
+preclude|padarīt neiespējamu|C1
+prescribe|izrakstīt|C1
+presume|pieņemt par patiesu|C1
+prevail|gūt virsroku|C1
+probe|pētīt dziļāk|C1
+prohibit|aizliegt|C1
+prolong|pagarināt laiku|C1
+propel|dzīt uz priekšu|C1
+provoke|provocēt|C1
+radiate|izstarot|C1
+rectify|izlabot|C1
+redeem|izpirkt|C1
+refine|pilnveidot|C1
+refrain|atturēties|C1
+reinforce|pastiprināt|C1
+reiterate|atkārtot vēlreiz|C1
+relinquish|atteikties|C1
+render|padarīt|C1
+renounce|atsacīties|C1
+reproduce|atveidot|C1
+resemble|līdzināties|C1
+reside|uzturēties|C1
+resolve|izlemt|C1
+restrain|savaldīt|C1
+retrieve|atgūt|C1
+revoke|atsaukt|C1
+rotate|rotēt|C1
+scrutinise|rūpīgi pārbaudīt|C1
+secure|nodrošināt drošību|C1
+seize|sagrābt|C1
+simulate|simulēt|C1
+speculate|spekulēt|C1
+stabilise|stabilizēt|C1
+stimulate|stimulēt|C1
+stipulate|paredzēt noteikumos|C1
+strive|censties|C1
+subdue|pakļaut|C1
+subsidise|subsidēt|C1
+suppress|apspiest|C1
+sway|svārstīties|C1
+terminate|izbeigt|C1
+thrive|plaukt|C1
+transcend|pārsniegt robežas|C1
+transmit|raidīt|C1
+undermine|graut|C1
+uphold|atbalstīt spēkā|C1
+utter|izteikt skaņu|C1
+validate|apstiprināt derīgumu|C1
+violate|pārkāpt|C1
+vow|apņemties|C1
+withhold|atturēt|C1
+withstand|izturēt spiedienu|C1
+ample|pietiekams|C1
+arbitrary|patvaļīgs|C1
+astute|vērīgs|C1
+authentic|autentisks|C1
+bleak|drūms|C1
+candid|atklāts|C1
+coherent|saskanīgs|C1
+compelling|pārliecinošs|C1
+concise|kodolīgs|C1
+conducive|veicinošs|C1
+contradictory|pretrunīgs|C1
+conventional|konvencionāls|C1
+credible|ticams|C1
+crucial|izšķirošs|C1
+cumbersome|apgrūtinošs|C1
+diligent|čakls|C1
+discreet|diskrēts|C1
+disproportionate|nesamērīgs|C1
+dubious|apšaubāms|C1
+eloquent|daiļrunīgs|C1
+elusive|grūti tverams|C1
+explicit|nepārprotams|C1
+feasible|realizējams|C1
+flawed|kļūdains|C1
+formidable|baismīgs|C1
+fragmented|sadrumstalots|C1
+futile|veltīgs|C1
+gradual|pakāpenisks|C1
+hectic|saspringts|C1
+hypothetical|hipotētisks|C1
+impartial|bezpartejisks|C1
+inclusive|iekļaujošs|C1
+inconsistent|nekonsekvents|C1
+indispensable|neaizstājams|C1
+inherent|raksturīgs|C1
+invaluable|nenovērtējams|C1
+irrelevant|nebūtisks|C1
+legitimate|likumīgs|C1
+lenient|iecietīgs|C1
+lucrative|ienesīgs|C1
+monotonous|vienmuļš|C1
+notorious|bēdīgi slavens|C1
+nuanced|niansēts|C1
+ominous|draudīgs|C1
+overwhelming|pārņemošs|C1
+paramount|pārākais|C1
+pragmatic|pragmatisks|C1
+precarious|nedrošs|C1
+prestigious|prestižs|C1
+prevalent|izplatīts|C1
+profitable|rentabls|C1
+prolific|ražīgs|C1
+prudent|apdomīgs|C1
+scarce|trūcīgs|C1
+scrupulous|apzinīgs|C1
+skeptical|skeptisks|C1
+spontaneous|spontāns|C1
+superficial|virspusējs|C1
+tangible|taustāms|C1
+tedious|nogurdinošs|C1
+tentative|provizorisks|C1
+trivial|niecīgs|C1
+unanimous|vienprātīgs|C1
+unprecedented|bezprecedenta|C1
+viable|dzīvotspējīgs|C1
+volatile|nepastāvīgs|C1
+ambiguity|neskaidrība|C1
+anecdote|anekdote|C1
+anomaly|anomālija|C1
+apparatus|aparāts|C1
+aptitude|spējas|C1
+arena|arēna|C1
+authenticity|autentiskums|C1
+autonomy|autonomija|C1
+backlash|pretreakcija|C1
+benchmark|etalons|C1
+bureaucracy|birokrātija|C1
+catalyst|katalizators|C1
+coalition|koalīcija|C1
+cohesion|saliedētība|C1
+compliance|atbilstība|C1
+compromise|kompromiss|C1
+consortium|konsorcijs|C1
+constituency|vēlēšanu apgabals|C1
+convergence|saplūšana|C1
+correlation|korelācija|C1
+credibility|ticamība|C1
+deterioration|pasliktināšanās|C1
+disruption|traucējums|C1
+diversification|dažādošana|C1
+doctrine|doktrīna|C1
+dynamics|dinamika|C1
+empathy|empātija|C1
+entity|subjekts|C1
+ethos|ētoss|C1
+exploitation|ekspluatācija|C1
+fallacy|maldīgs uzskats|C1
+fluctuation|svārstības|C1
+forefront|priekšplāns|C1
+gravity|nopietnība|C1
+hardship|grūtības|C1
+hindsight|vēlāka atskārsme|C1
+impetus|impulss|C1
+inequality|nevienlīdzība|C1
+inflation|inflācija|C1
+inception|aizsākums|C1
+innovation|inovācija|C1
+integration|integrācija|C1
+intuition|intuīcija|C1
+jurisdiction|jurisdikcija|C1
+legitimacy|leģitimitāte|C1
+leverage|svira|C1
+mandate|mandāts|C1
+milestone|pagrieziena punkts|C1
+misconception|maldīgs priekšstats|C1
+momentum|inerce|C1
+nuance|nianse|C1
+oversight|uzraudzība|C1
+paradigm|paradigma|C1
+paradox|paradokss|C1
+pitfall|slazds|C1
+predecessor|priekštecis|C1
+prerequisite|priekšnosacījums|C1
+prototype|prototips|C1
+rationale|pamatojums|C1
+reconciliation|samierināšanās|C1
+redundancy|atlaišana|C1
+resilience|noturība|C1
+rhetoric|retorika|C1
+scrutiny|rūpīga pārbaude|C1
+stakeholder|ieinteresētā persona|C1
+stigma|stigma|C1
+subsidiary|meitasuzņēmums|C1
+synthesis|sintēze|C1
+taboo|tabu|C1
+threshold|slieksnis|C1
+transparency|caurskatāmība|C1
+turnover|apgrozījums|C1
+undertaking|pasākums|C1
+vicinity|tuvums|C1
+viewpoint|skatpunkts|C1
+wholesale|vairumtirdzniecība|C1
+acquisition|iegāde|C1
+merger|apvienošanās|C1
+bankruptcy|bankrots|C1
+creditor|kreditors|C1
+debtor|parādnieks|C1
+dividend|dividende|C1
+equity|pašu kapitāls|C1
+liquidity|likviditāte|C1
+audit|audits|C1
+auditor|auditors|C1
+accountant|grāmatvedis|C1
+overhead|pieskaitāmās izmaksas|C1
+forecast|prognoze|C1
+outsourcing|ārpakalpojumi|C1
+logistics|loģistika|C1
+procurement|iepirkums|C1
+tender|konkurss|C1
+warehouse|noliktava|C1
+shipping|nosūtīšana|C1
+tariff|tarifs|C1
+embargo|embargo|C1
+sanction|sankcija|C1
+diplomat|diplomāts|C1
+embassy|vēstniecība|C1
+ambassador|vēstnieks|C1
+asylum|patvērums|C1
+immigrant|imigrants|C1
+census|tautas skaitīšana|C1
+referendum|referendums|C1
+ballot|biļetens|C1
+legislature|likumdevēja vara|C1
+amendment|grozījums|C1
+verdict|spriedums|C1
+trial|tiesas process|C1
+plaintiff|prasītājs|C1
+defendant|atbildētājs|C1
+testimony|liecība|C1
+fraud|krāpšana|C1
+corruption|korupcija|C1
+bribe|kukulis|C1
+espionage|spiegošana|C1
+terrorism|terorisms|C1
+surveillance|novērošana|C1
+encryption|šifrēšana|C1
+firewall|ugunsmūris|C1
+malware|ļaunprogrammatūra|C1
+bandwidth|joslas platums|C1
+server|serveris|C1
+cloud computing|mākoņdatošana|C1
+user|lietotājs|C1
+keyword|atslēgvārds|C1
+bug|kļūda programmā|C1
+patch|ielāps|C1
+debug|atkļūdot|C1
+scalable|mērogojams|C1
+vaccine|vakcīna|C1
+epidemic|epidēmija|C1
+pandemic|pandēmija|C1
+symptom|simptoms|C1
+diagnosis|diagnoze|C1
+therapy|terapija|C1
+surgery|operācija|C1
+prescription|zāļu recepte|C1
+allergy|alerģija|C1
+immune|imūns|C1
+infection|infekcija|C1
+chronic|hronisks|C1
+acute|akūts|C1
+disability|invaliditāte|C1
+addiction|atkarība|C1
+obesity|aptaukošanās|C1
+nutrition|uzturs|C1
+diet|diēta|C1
+calorie|kalorija|C1
+protein|olbaltumvielas|C1
+vitamin|vitamīns|C1
+fibre|šķiedrvielas|C1
+emission|emisija|C1
+renewable|atjaunojams|C1
+sustainable|ilgtspējīgs|C1
+biodiversity|bioloģiskā daudzveidība|C1
+ecosystem|ekosistēma|C1
+extinction|izzušana|C1
+habitat|dzīvotne|C1
+drought|sausums|C1
+earthquake|zemestrīce|C1
+hurricane|viesuļvētra|C1
+wildfire|meža ugunsgrēks|C1
+global warming|globālā sasilšana|C1
+greenhouse|siltumnīca|C1
+recycling|pārstrāde|C1
+landfill|izgāztuve|C1
+fossil fuel|fosilais kurināmais|C1
+nuclear|kodolu|C1
+wind turbine|vēja turbīna|C1
+discrimination|diskriminācija|C1
+equality|vienlīdzība|C1
+human rights|cilvēktiesības|C1
+gender|dzimums|C1
+ethnic|etnisks|C1
+tolerance|iecietība|C1
+activism|aktīvisms|C1
+protester|protestētājs|C1
+propaganda|propaganda|C1
+censorship|cenzūra|C1
+press|prese|C1
+tabloid|bulvārprese|C1
+accountable|atbildīgs par|C1
+adjacent|blakus esošs|C1
+affluent|pārticis|C1
+alleged|iespējamais|C1
+ambivalent|divējāds|C1
+amiable|draudzīgs|C1
+apathetic|vienaldzīgs|C1
+arrogant|augstprātīgs|C1
+austere|askētisks|C1
+benevolent|labvēlīgs|C1
+cynical|ciniski noskaņots|C1
+diverse|daudzveidīgs|C1
+dormant|snaudošs|C1
+enthusiastic|entuziastisks|C1
+equivalent|ekvivalents|C1
+fluent|raits|C1
+gullible|lētticīgs|C1
+haphazard|nejaušs|C1
+hospitable|viesmīlīgs|C1
+impulsive|impulsīvs|C1
+indifferent|vienaldzīgs|C1
+inevitably|neizbēgami|C1
+nonetheless|tomēr|C1
+notwithstanding|neskatoties uz|C1
+conversely|savukārt|C1
+henceforth|turpmāk|C1
+albeit|kaut gan|C1
+whereas|kamēr|C1
+thereby|tādējādi|C1
+hence|tātad|C1
+accordingly|attiecīgi|C1
+consequently|līdz ar to|C1`;
+/*WORDS_END*/
+const parseX=str=>str.split('\n').map(l=>l.trim().split('|')).filter(a=>a.length>=3).map(a=>[a[0],a[1],a[2]]);
+const DECK=[...parse(A1_STR,'A1'),...parse(A2_STR,'A2'),...parse(B1_STR,'B1'),...parseX(EXTRA)];
+
+const TEXTS = [
+ {t:"Mara's day", s:"My name is Mara. I live in Latvia. I work in an office. Every morning I drink coffee. I go to work by car. In the evening I read a book. I like my cat. My cat is small and white. I sleep at night."},
+ {t:"At the shop", s:"I go to the shop today. I need bread, milk and cheese. The bread is new. The milk is cold. I ask, \"How much is the cheese?\" The woman answers, \"Three euro.\" I pay and say thank you. Then I go home."},
+ {t:"My family", s:"I have a big family. My mother is happy. My father works in the city. My brother has a dog. My sister likes tea. We eat together in the evening. We speak and we laugh. I love my family."}
+];
+
+/*STORIES_START*/
+const STORIES=[{"id": "fox", "t": "The Fox and the Grapes", "l": "A2", "s": "A hungry fox was walking through a garden. High on a branch he saw some big, purple grapes. \"What a lovely lunch,\" he thought. He jumped, but he could not reach them. He jumped again and again. At last he was tired. He sat down and looked at the grapes for a long time. Then he stood up and walked away. \"Those grapes are probably sour,\" he said. \"I do not want them anyway.\""}, {"id": "tortoise", "t": "The Tortoise and the Hare", "l": "A2", "s": "A hare laughed at a slow tortoise. \"I can run much faster than you,\" he said. \"Let us have a race,\" said the tortoise. The animals came to watch. The hare ran very fast and soon he was far ahead. He was sure he could win, so he lay down under a tree and went to sleep. The tortoise walked slowly and never stopped. When the hare woke up, the tortoise was almost at the end. The hare ran as fast as he could, but it was too late. The tortoise won the race."}, {"id": "lionmouse", "t": "The Lion and the Mouse", "l": "A2", "s": "A lion was sleeping in the forest when a small mouse ran over his face. The lion woke up and caught the mouse. \"Please let me go,\" said the mouse. \"One day I will help you.\" The lion laughed, but he opened his hand. A few days later, hunters caught the lion in a strong net. He could not move. The little mouse heard him cry and came quickly. She cut the ropes with her teeth, and the lion was free. \"Now you see,\" said the mouse, \"even a small friend can be a big help.\""}, {"id": "morning", "t": "A Busy Morning", "l": "A2", "s": "Anna wakes up at six o'clock. She takes a quick shower and makes coffee. She is always late, so she does not have time for breakfast. She puts her laptop and her keys in her bag and runs to the bus stop. The bus is full this morning. She stands next to a man with a big umbrella because it is raining. At work, she meets her friend Tom in the kitchen. \"You look tired,\" he says. \"I am,\" says Anna. \"I have a long day, and I need another cup of coffee.\""}, {"id": "phone", "t": "The Lost Phone", "l": "A2", "s": "Mark cannot find his phone. He looks in his bag, in his jacket and under the bed. He asks his sister, \"Have you seen my phone?\" She says, \"No, but call it.\" Mark has no other phone, so he borrows hers. He hears a small sound from the kitchen. The phone is in the fridge, next to the milk! Mark remembers that he was talking on it while he was making breakfast. His sister laughs. \"You forget everything,\" she says. Mark smiles and puts the phone in his pocket. \"Next time,\" he says, \"I will look in the fridge first.\""}, {"id": "doctor", "t": "At the Doctor", "l": "A2", "s": "Lisa has a bad cough and a headache. She decides to see a doctor. The doctor's office is small and quiet. A nurse asks her name and gives her a form. After ten minutes, the doctor calls her in. \"How long have you felt ill?\" she asks. \"About three days,\" says Lisa. The doctor listens to her chest and checks her temperature. \"You have a cold,\" she says. \"You need to rest, drink a lot of water and stay at home.\" She writes a note for Lisa's boss. Lisa says thank you and goes home to bed."}, {"id": "wolf", "t": "The Boy Who Cried Wolf", "l": "A2", "s": "A young shepherd looked after sheep on a hill near a village. He was bored, so he decided to play a trick. \"Wolf! Wolf!\" he shouted. The villagers ran up the hill, but there was no wolf. The boy laughed. He did it again the next day, and again people came to help. One evening a real wolf came. \"Wolf! Wolf!\" cried the boy. This time nobody came, because they thought he was lying again. The wolf took many sheep. The boy was very sad. He learned that people do not believe someone who lies."}, {"id": "rain", "t": "A Rainy Weekend", "l": "A2", "s": "It rains all weekend, so Peter and his daughter stay at home. On Saturday they bake a cake. They forget the sugar, so the cake is not sweet, but they eat it with honey. In the afternoon they play cards and listen to music. On Sunday the sun comes out for an hour, and they go for a short walk. The streets are wet and quiet. They see a small dog in a yellow coat. At home they make soup and watch a film. \"This was a good weekend,\" says his daughter. \"Even with the rain.\""}, {"id": "ant", "t": "The Ant and the Grasshopper", "l": "B1", "s": "All summer the grasshopper sang and played in the sun. His neighbour, the ant, worked hard every day. She carried food to her nest and stored it for winter. \"Why do you work so much?\" asked the grasshopper. \"Come and enjoy the weather!\" \"I am preparing for winter,\" said the ant. \"You should do the same.\" The grasshopper only laughed. When winter came, the fields were covered with snow. The grasshopper was cold and hungry, and he had nothing to eat. He went to the ant's door and asked for help. The ant gave him a little food, but she also said, \"Next summer, remember this winter.\""}, {"id": "newjob", "t": "A New Job", "l": "B1", "s": "On her first day at the new company, Elena arrived twenty minutes early. She felt nervous, but everyone was friendly. Her manager showed her the office and introduced her to the team. \"Don't worry about learning everything today,\" he said. \"Just ask questions.\" Elena received a laptop, a password and a long list of people to meet. By lunchtime her head was full of names. In the afternoon she sat with a colleague who explained how the main system worked. It was confusing, but interesting. When she left, she was exhausted, yet she felt happy. She had a good feeling about this job."}, {"id": "mice", "t": "The Town Mouse and the Country Mouse", "l": "B1", "s": "A town mouse visited his cousin in the country. The country mouse offered simple food: bread, nuts and a little cheese. \"Is this all you have?\" asked the town mouse. \"Come to the city with me. You will eat like a king.\" In the city, the table was full of delicious food. But just as they began to eat, a big cat came into the room. The mice ran away and hid in a hole, shaking with fear. \"I am going home,\" said the country mouse. \"I would rather eat simple food in peace than have a feast in danger.\""}, {"id": "train", "t": "Missing the Train", "l": "B1", "s": "Daniel ran along the platform, but the train was already leaving. He had an important meeting in another city, and the next train was in two hours. He called his colleague to explain the situation. \"Don't worry,\" she said. \"We will move the meeting to the afternoon.\" Daniel sat in a café and ordered a coffee. He realised that he had left home late because he had stayed up working until midnight. He decided to change his habits. On the next train he finally relaxed and read a book. The meeting went well, and nobody was angry."}, {"id": "goose", "t": "The Goose with the Golden Eggs", "l": "B1", "s": "A farmer had a goose that laid one golden egg every day. He sold the eggs and became rich. But he wanted more. \"Why wait for one egg a day?\" he thought. \"Inside the goose there must be a lot of gold.\" So he killed the goose and cut it open. To his surprise, there was no gold inside. It was an ordinary goose, like any other. The farmer had lost his lucky goose and all the golden eggs. He sat down and cried. From that day on, he understood that greed can destroy what we already have."}, {"id": "mountains", "t": "A Trip to the Mountains", "l": "B1", "s": "Last summer, we spent a week in the mountains. We stayed in a small wooden house near a lake. Every morning we got up early and went hiking. The air was clean, and the views were amazing. On the third day, the weather changed suddenly. Dark clouds covered the sky, and it began to rain heavily. We had to turn back and walk quickly down the path. We were wet and cold when we reached the house, but the owner gave us hot tea and fresh bread. That evening, we laughed about it. It was the best holiday we have ever had."}, {"id": "woodcutter", "t": "The Honest Woodcutter", "l": "B1", "s": "A poor woodcutter dropped his axe into a deep river. He sat on the bank and began to cry because he could not afford a new one. Suddenly a spirit appeared with a golden axe. \"Is this yours?\" it asked. \"No,\" said the woodcutter. The spirit showed him a silver axe. \"No,\" he said again. Finally it held up his old iron axe. \"Yes, that is mine,\" he said happily. The spirit was impressed by his honesty and gave him all three axes. When a greedy neighbour heard the story, he tried the same trick, but the spirit was not fooled."}, {"id": "moving", "t": "Moving to a New City", "l": "B1", "s": "Moving to a new city is exciting, but it is also stressful. When Nina arrived, she knew nobody. She rented a small flat, bought some furniture and spent the first weekend exploring the old town. She found it difficult to make friends at first. Then she joined a language class and a running club. Slowly, the city started to feel like home. She learned which cafés were cheap, which streets were quiet and which bus was always late. After six months, she realised she no longer needed a map. \"I have a life here now,\" she thought."}, {"id": "windsun", "t": "The North Wind and the Sun", "l": "B2", "s": "The North Wind and the Sun argued about which of them was stronger. They saw a traveller walking along the road, wrapped in a heavy coat. \"Let us see who can make him take it off,\" said the Sun. The Wind agreed and blew with all his strength. But the harder he blew, the tighter the traveller held his coat. At last the Wind gave up. Then the Sun began to shine gently. Soon the traveller felt warm, then hot, and finally he took off his coat and sat in the shade. The Wind had to admit that kindness is often more effective than force."}, {"id": "decision", "t": "A Difficult Decision", "l": "B2", "s": "Marta had been offered a better job in another country, and she had one week to decide. The salary was higher, and the position was exactly what she had always wanted. However, she would have to leave her family and friends behind. She made a list of advantages and disadvantages, but it did not help. She talked to her sister, who simply said, \"Which choice would you regret more?\" That question stayed in her mind all night. In the morning, Marta realised that she was more afraid of staying than of leaving. She picked up the phone and accepted the offer."}, {"id": "bear", "t": "The Two Travellers and the Bear", "l": "B2", "s": "Two friends were travelling through a forest when a bear suddenly appeared on the path. One of them quickly climbed a tree, leaving his companion alone. The other man had no time to escape, so he lay on the ground and pretended to be dead. The bear sniffed around his head, then slowly walked away. When it was safe, the first friend came down. \"What did the bear whisper in your ear?\" he asked. \"It said I should never trust a friend who abandons me in danger,\" answered the other. After that day, their friendship was never the same."}, {"id": "complaint", "t": "The Customer Complaint", "l": "B2", "s": "The customer walked into the service centre looking furious. \"I brought my car here three days ago,\" he said, \"and the problem still hasn't been fixed.\" The receptionist listened carefully and apologised. She explained that a spare part had arrived late, which had delayed the repair. \"I understand your frustration,\" she said. \"I can offer you a replacement car until yours is ready, and we will not charge you for the extra days.\" The man's expression softened. He had expected an argument, not a solution. He thanked her, signed the form and left, a little calmer than when he had arrived."}, {"id": "sons", "t": "The Old Man and His Sons", "l": "B2", "s": "An old man had several sons who were always quarrelling. One day he called them together and gave each of them a stick. \"Break it,\" he said. They did so easily. Then he tied a bundle of sticks together and asked them to break that. Each son tried with all his strength, but nobody could do it. \"You see,\" said the father, \"alone, you are weak, and anyone can defeat you. But if you stay united, you will be strong.\" The sons looked at one another and felt ashamed. From then on they supported each other, and the family prospered."}, {"id": "homework", "t": "Working from Home", "l": "B2", "s": "At first, working from home sounded perfect. There was no commute, no noisy open-plan office and unlimited coffee. But after a few weeks, Jonas noticed problems. He worked longer hours because the office was always just a few steps away, and he rarely spoke to anyone except his cat. To regain control, he set clear rules for himself: start at nine, finish at five, take a proper lunch break. He also began to work from a café twice a week. Gradually, he found a balance. \"The key,\" he told a friend, \"is to treat home as a workplace, but not as a prison.\""}, {"id": "reflection", "t": "The Dog and His Reflection", "l": "B2", "s": "A dog was carrying a large piece of meat across a bridge when he saw his reflection in the water below. He thought it was another dog with an even bigger piece of meat. Greedily, he opened his mouth to grab it. As soon as he did, his own meat fell into the river and disappeared. The dog stared at the empty water. There was nothing left, neither the real meat nor the imaginary one. He walked home hungry and ashamed, having learned that wanting too much can cost you everything you already have."}, {"id": "powercut", "t": "The Power Cut", "l": "B2", "s": "At eight o'clock in the evening, the whole street went dark. For a moment nobody understood what was happening, and then neighbours began to come out of their houses with candles and torches. Somebody said that a storm had damaged the power lines. The mobile networks were also down, so people could not call the electricity company. Instead of complaining, they began to talk to each other. Someone brought out a guitar, and a few children started to sing. When the lights finally came back after three hours, a few people were almost disappointed. It had been the most sociable evening in years."}];
+/*STORIES_END*/
+/*SENTS_START*/
+const SENTS={"afraid":[["I am afraid of big dogs.","afraid"]],"airport":[["The airport is far from the city.","airport"]],"angry":[["My boss was angry about the mistake.","angry"]],"arrive":[["We arrive in Riga at six o'clock.","arrive"]],"bag":[["She put her laptop in the bag.","bag"]],"beautiful":[["It is a beautiful day today.","beautiful"]],"begin":[["The film will begin in ten minutes.","begin"]],"borrow":[["Can I borrow your pen, please?","borrow"]],"boring":[["The lesson was long and boring.","boring"]],"breakfast":[["I usually have eggs for breakfast.","breakfast"]],"lunch":[["Let's have lunch together tomorrow.","lunch"]],"dinner":[["We eat dinner at seven o'clock.","dinner"]],"build":[["They want to build a new bridge.","build"]],"busy":[["I cannot talk now because I am busy.","busy"]],"careful":[["Be careful, the floor is wet.","careful"]],"carry":[["Can you carry this box for me?","carry"]],"cheap":[["This restaurant is cheap and good.","cheap"]],"expensive":[["The hotel was too expensive for us.","expensive"]],"choose":[["You can choose any cake you like.","choose"]],"clean":[["Please keep your room clean.","clean"]],"dirty":[["My shoes are dirty after the walk.","dirty"]],"clothes":[["I need new clothes for the winter.","clothes"]],"cook":[["My father likes to cook on Sundays.","cook"]],"dangerous":[["It is dangerous to drive in the fog.","dangerous"]],"decide":[["I cannot decide what to wear.","decide"]],"early":[["I get up early every morning.","early"]],"late":[["Sorry, I am late for the meeting.","late"]],"empty":[["The fridge is empty again.","empty"]],"full":[["The bus was full of people.","full"]],"enough":[["I do not have enough money.","enough"]],"enjoy":[["I enjoy walking in the forest.","enjoy"]],"forget":[["Don't forget your keys.","forget"]],"remember":[["I cannot remember his name.","remember"]],"free":[["Are you free on Friday evening?","free"]],"future":[["What do you want to do in the future?","future"]],"past":[["In the past, people wrote more letters.","past"]],"garden":[["We have a small garden behind the house.","garden"]],"gift":[["She gave me a gift for my birthday.","gift"]],"health":[["Good health is more important than money.","health"]],"hungry":[["I am hungry, let's eat something.","hungry"]],"thirsty":[["After running, I was very thirsty.","thirsty"]],"idea":[["That is a very good idea.","idea"]],"important":[["It is important to sleep well.","important"]],"invite":[["I want to invite you to my party.","invite"]],"join":[["Would you like to join us for dinner?","join"]],"journey":[["The journey to the mountains took five hours.","journey"],["It was a long journey.","journey"]],"keep":[["Please keep this secret.","keep"]],"kitchen":[["She is cooking in the kitchen.","kitchen"]],"learn":[["I want to learn English fast.","learn"]],"leave":[["We leave at eight o'clock.","leave"]],"lend":[["Can you lend me some money until Friday?","lend"]],"lose":[["I always lose my umbrella.","lose"]],"find":[["I cannot find my phone.","find"]],"meet":[["Let's meet in front of the cinema.","meet"]],"miss":[["I miss my family when I travel.","miss"]],"mistake":[["I made a mistake in the report.","mistake"]],"neighbour":[["My neighbour has a big dog.","neighbour"]],"noisy":[["The street is very noisy at night.","noisy"]],"quiet":[["Please be quiet, the baby is sleeping.","quiet"]],"often":[["I often go to the gym after work.","often"]],"sometimes":[["Sometimes I walk to work.","Sometimes"]],"ticket":[["I bought a ticket for the train.","ticket"]],"travel":[["I love to travel in the summer.","travel"]],"weather":[["The weather is bad today.","weather"]],"wait":[["Please wait here for a minute.","wait"]],"wear":[["I like to wear black clothes.","wear"]],"worry":[["Don't worry, everything will be fine.","worry"]],"message":[["I sent you a message this morning.","message"]],"meeting":[["The meeting starts at ten.","meeting"]],"boss":[["My boss is on holiday this week.","boss"]],"customer":[["The customer wants to speak to the manager.","customer"]],"holiday":[["We are on holiday next week.","holiday"]],"because":[["I stayed at home because it was raining.","because"]],"but":[["I like tea, but I do not like coffee.","but"]],"or":[["Do you want tea or coffee?","or"]],"if":[["If it rains, we will stay at home.","If"]],"when":[["Call me when you arrive.","when"]],"while":[["She reads a book while she waits.","while"]],"before":[["Wash your hands before dinner.","before"]],"after":[["We went for a walk after lunch.","after"]],"between":[["The bank is between the school and the park.","between"]],"through":[["The train goes through a long tunnel.","through"]],"during":[["He slept during the film.","during"]],"without":[["I cannot work without coffee.","without"]],"inside":[["The cat is sleeping inside the box.","inside"]],"outside":[["The children are playing outside.","outside"]],"near":[["My office is near the station.","near"]],"far":[["The airport is far from the city centre.","far"]],"behind":[["The garden is behind the house.","behind"]],"above":[["There is a lamp above the table.","above"]],"below":[["The temperature is below zero.","below"]],"across":[["He walked across the street.","across"]],"along":[["We walked along the river.","along"]],"against":[["I am against this idea.","against"]],"around":[["They travelled around the world.","around"]],"until":[["Wait here until I come back.","until"]],"since":[["I have lived here since 2020.","since"]],"already":[["I have already eaten.","already"]],"still":[["Are you still working?","still"]],"yet":[["I have not finished yet.","yet"]],"again":[["Please say it again.","again"]],"almost":[["The bus is almost full.","almost"]],"only":[["I have only five euros.","only"]],"also":[["She speaks English and also German.","also"]],"even":[["Even my brother knows the answer.","Even"]],"just":[["I just finished my work.","just"]],"really":[["I really like this song.","really"]],"maybe":[["Maybe we can meet tomorrow.","Maybe"]],"probably":[["It will probably rain tonight.","probably"]],"perhaps":[["Perhaps he forgot the key.","Perhaps"]],"quite":[["The film was quite good.","quite"]],"very":[["This soup is very hot.","very"]],"too":[["The coffee is too hot.","too"]],"together":[["We work together.","together"]],"alone":[["She lives alone.","alone"]],"everyone":[["Everyone is waiting for you.","Everyone"]],"someone":[["Someone is at the door.","Someone"]],"anything":[["Do you need anything?","anything"]],"nothing":[["I know nothing about cars.","nothing"]],"everything":[["Everything is ready.","Everything"]],"nobody":[["Nobody knows the answer.","Nobody"]],"somewhere":[["I left my keys somewhere.","somewhere"]],"everywhere":[["There are flowers everywhere.","everywhere"]],"other":[["Show me the other shirt.","other"]],"another":[["Can I have another cup of tea?","another"]],"same":[["We have the same teacher.","same"]],"different":[["These two shoes are different.","different"]],"each":[["Each student has a book.","Each"]],"every":[["I go to work every day.","every"]],"both":[["Both of my brothers live abroad.","Both"]],"many":[["Many people came to the concert.","Many"]],"much":[["I do not have much time.","much"]],"few":[["Few people know this place.","Few"]],"little":[["I speak a little English.","little"]],"several":[["I called him several times.","several"]],"most":[["Most shops close at eight.","Most"]],"more":[["Can I have more water?","more"]],"less":[["You should eat less sugar.","less"]],"first":[["This is my first lesson.","first"]],"second":[["Wait a second, please.","second"]],"last":[["He was the last person to leave.","last"]],"next":[["See you next week.","next"]],"half":[["I ate half of the cake.","half"]],"minute":[["Please wait one minute.","minute"]],"hour":[["The meeting lasts one hour.","hour"]],"month":[["I will visit you next month.","month"]],"weekend":[["What are you doing at the weekend?","weekend"]],"Monday":[["I have English class on Monday.","Monday"]],"Tuesday":[["We meet every Tuesday.","Tuesday"]],"Wednesday":[["On Wednesday I work from home.","Wednesday"]],"Thursday":[["The shop is closed on Thursday.","Thursday"]],"Friday":[["Thank God it is Friday!","Friday"]],"Saturday":[["We go shopping on Saturday.","Saturday"]],"Sunday":[["My family has lunch together on Sunday.","Sunday"]],"January":[["It is very cold in January.","January"]],"February":[["February is the shortest month.","February"]],"March":[["Spring begins in March.","March"]],"April":[["It often rains in April.","April"]],"May":[["My birthday is in May.","May"]],"June":[["We have a long holiday in June.","June"]],"July":[["It is hot in July.","July"]],"August":[["We went to the sea in August.","August"]],"September":[["School starts in September.","September"]],"October":[["The leaves are yellow in October.","October"]],"November":[["November is dark and wet.","November"]],"December":[["We celebrate Christmas in December.","December"]],"spring":[["Flowers grow in spring.","spring"]],"summer":[["We swim in the sea in summer.","summer"]],"autumn":[["Leaves fall in autumn.","autumn"]],"winter":[["It snows in winter.","winter"]],"season":[["Winter is my favourite season.","season"]],"rain":[["Take an umbrella, there is rain today.","rain"]],"snow":[["The snow is white and soft.","snow"]],"wind":[["The wind is very strong today.","wind"]],"sun":[["The sun is shining.","sun"]],"cloud":[["There is a dark cloud in the sky.","cloud"]],"storm":[["A big storm is coming.","storm"]],"fog":[["The fog is so thick that I cannot see the road.","fog"]],"ice":[["Be careful, there is ice on the road.","ice"]],"warm":[["It is warm in the room.","warm"]],"cool":[["The water in the lake is cool.","cool"]],"wet":[["My shoes are wet.","wet"]],"dry":[["The towel is dry.","dry"]],"sunny":[["Today is a sunny day.","sunny"]],"cloudy":[["It is cloudy this morning.","cloudy"]],"windy":[["It is windy on the beach.","windy"]],"temperature":[["What is the temperature today?","temperature"]],"head":[["My head hurts.","head"]],"face":[["She has a kind face.","face"]],"eye":[["He closed one eye.","eye"]],"ear":[["He whispered something in my ear.","ear"]],"nose":[["My nose is cold.","nose"]],"mouth":[["Open your mouth, please.","mouth"]],"tooth":[["I have a pain in my tooth.","tooth"]],"hair":[["She has long hair.","hair"]],"neck":[["He wears a scarf around his neck.","neck"]],"shoulder":[["She put her bag on her shoulder.","shoulder"]],"arm":[["He broke his arm.","arm"]],"hand":[["Give me your hand.","hand"]],"finger":[["I cut my finger.","finger"]],"leg":[["My leg hurts after running.","leg"]],"foot":[["He hurt his foot.","foot"]],"knee":[["My knee hurts when I climb the stairs.","knee"]],"back":[["My back hurts.","back"]],"chest":[["The doctor listened to his chest.","chest"]],"stomach":[["My stomach hurts.","stomach"]],"heart":[["My heart beats fast.","heart"]],"skin":[["Use cream for dry skin.","skin"]],"blood":[["The nurse took a little blood.","blood"]],"bone":[["The dog has a bone.","bone"]],"body":[["Exercise is good for your body.","body"]],"voice":[["She has a beautiful voice.","voice"]],"lip":[["She put cream on her lip.","lip"]],"brain":[["The brain controls the body.","brain"]],"doctor":[["I have an appointment with the doctor.","doctor"]],"nurse":[["The nurse is very kind.","nurse"]],"hospital":[["He is in hospital.","hospital"]],"medicine":[["Take this medicine twice a day.","medicine"]],"pain":[["I have a pain in my back.","pain"]],"headache":[["I have a bad headache.","headache"]],"fever":[["The child has a fever.","fever"]],"cough":[["I have a cough.","cough"]],"ill":[["She is ill today.","ill"]],"tired":[["I am tired after work.","tired"]],"healthy":[["Fruit is healthy.","healthy"]],"injury":[["He has a knee injury.","injury"]],"pill":[["Take one pill after breakfast.","pill"]],"patient":[["The patient is waiting in the corridor.","patient"],["Please be patient, the doctor is busy.","patient"]],"dentist":[["I go to the dentist twice a year.","dentist"]],"appointment":[["I have an appointment at ten.","appointment"]],"rice":[["We had chicken with rice for dinner.","rice"]],"pasta":[["I cooked pasta with tomato sauce.","pasta"]],"soup":[["The soup is too hot to eat.","soup"]],"salad":[["I would like a salad and some bread.","salad"]],"sandwich":[["He ate a sandwich for lunch.","sandwich"]],"butter":[["Please pass me the butter.","butter"]],"sugar":[["I do not take sugar in my tea.","sugar"]],"salt":[["The soup needs more salt.","salt"]],"pepper":[["Do you want some pepper on your eggs?","pepper"]],"oil":[["Fry the onions in a little oil.","oil"]],"vegetable":[["Carrot is my favourite vegetable.","vegetable"]],"fruit":[["I eat fruit every morning.","fruit"]],"potato":[["We had a baked potato with cheese.","potato"]],"tomato":[["She cut a tomato for the salad.","tomato"]],"onion":[["Chop the onion into small pieces.","onion"]],"carrot":[["The rabbit is eating a carrot.","carrot"]],"banana":[["I take a banana to work every day.","banana"]],"orange":[["He drinks a glass of orange juice.","orange"]],"lemon":[["Add a slice of lemon to your tea.","lemon"]],"strawberry":[["The strawberry cake was delicious.","strawberry"]],"chicken":[["We are having roast chicken tonight.","chicken"]],"beef":[["I do not eat beef.","beef"]],"pork":[["Pork is common in Latvian food.","Pork"]],"sausage":[["He fried a sausage for breakfast.","sausage"]],"cake":[["She baked a chocolate cake for my birthday.","cake"]],"chocolate":[["I love dark chocolate.","chocolate"]],"ice cream":[["The children want ice cream.","ice cream"]],"juice":[["Can I have a glass of juice?","juice"]],"beer":[["He ordered a cold beer.","beer"]],"wine":[["We drank a glass of red wine.","wine"]],"bottle":[["Please buy a bottle of water.","bottle"]],"glass":[["She drank a glass of milk.","glass"]],"cup":[["I would like a cup of tea.","cup"]],"plate":[["Put the plate on the table.","plate"]],"bowl":[["She ate a bowl of soup.","bowl"]],"knife":[["Be careful with the sharp knife.","knife"]],"fork":[["I need a fork and a knife.","fork"]],"spoon":[["Stir the tea with a spoon.","spoon"]],"menu":[["Can we see the menu, please?","menu"]],"bill":[["Can we have the bill, please?","bill"]],"tip":[["We left a small tip for the waiter.","tip"]],"restaurant":[["We had dinner in a nice restaurant.","restaurant"]],"waiter":[["The waiter brought us the menu.","waiter"]],"floor":[["The cat is sleeping on the floor.","floor"]],"wall":[["There is a picture on the wall.","wall"]],"roof":[["The roof of the house is red.","roof"]],"stairs":[["Take the stairs to the second floor.","stairs"]],"bathroom":[["The bathroom is next to the bedroom.","bathroom"]],"bedroom":[["My bedroom is small but quiet.","bedroom"]],"living room":[["We watch television in the living room.","living room"]],"toilet":[["Where is the toilet, please?","toilet"]],"shower":[["I take a shower every morning.","shower"]],"lamp":[["Turn on the lamp, it is dark.","lamp"]],"key":[["I lost my key yesterday.","key"]],"mirror":[["She looked at herself in the mirror.","mirror"]],"carpet":[["The carpet in the hall is blue.","carpet"]],"curtain":[["Please close the curtain.","curtain"]],"fridge":[["There is some milk in the fridge.","fridge"]],"oven":[["Put the cake in the oven.","oven"]],"cupboard":[["The plates are in the cupboard.","cupboard"]],"shelf":[["The books are on the top shelf.","shelf"]],"bin":[["Throw the paper in the bin.","bin"]],"towel":[["Can I have a clean towel?","towel"]],"soap":[["Wash your hands with soap.","soap"]],"blanket":[["It is cold, bring a blanket.","blanket"]],"pillow":[["I need a softer pillow.","pillow"]],"furniture":[["They bought new furniture for the flat.","furniture"]],"apartment":[["We live in a small apartment.","apartment"]],"shirt":[["He is wearing a white shirt.","shirt"]],"trousers":[["These trousers are too long.","trousers"]],"jeans":[["I wear jeans almost every day.","jeans"]],"dress":[["She wore a long red dress.","dress"]],"skirt":[["This skirt is too short.","skirt"]],"jacket":[["Take a jacket, it is cold outside.","jacket"]],"coat":[["She put on her warm coat.","coat"]],"hat":[["He wears a hat in winter.","hat"]],"shoe":[["I lost one shoe.","shoe"]],"sock":[["There is a hole in my sock.","sock"]],"glove":[["I forgot my glove at home.","glove"]],"scarf":[["She wears a long scarf.","scarf"]],"belt":[["He bought a new leather belt.","belt"]],"pocket":[["I put my phone in my pocket.","pocket"]],"bicycle":[["I go to work by bicycle.","bicycle"]],"motorcycle":[["He bought a big motorcycle.","motorcycle"]],"plane":[["The plane leaves at noon.","plane"]],"ship":[["The ship arrives in the morning.","ship"]],"boat":[["We took a boat to the island.","boat"]],"taxi":[["Let's take a taxi to the airport.","taxi"]],"station":[["The train station is near my house.","station"]],"street":[["I live on a quiet street.","street"]],"bridge":[["We crossed the bridge on foot.","bridge"]],"corner":[["The shop is on the corner.","corner"]],"traffic":[["The traffic is terrible this morning.","traffic"]],"driver":[["The bus driver was very friendly.","driver"]],"passenger":[["Every passenger needs a ticket.","passenger"]],"luggage":[["Where can I leave my luggage?","luggage"]],"passport":[["Do not forget your passport.","passport"]],"map":[["Can you show me on the map?","map"]],"petrol":[["We need to buy petrol.","petrol"]],"parking":[["There is free parking behind the shop.","parking"]],"wheel":[["The car has a flat wheel.","wheel"]],"accident":[["There was an accident on the road.","accident"],["The accident happened at night.","accident"]],"speed":[["The speed limit is fifty.","speed"]],"school":[["The children go to school by bus.","school"]],"university":[["She studies at the university.","university"]],"student":[["He is a student of business.","student"]],"teacher":[["My English teacher is very patient.","teacher"]],"lesson":[["The lesson starts at nine o'clock.","lesson"]],"exam":[["I have an exam on Monday.","exam"]],"homework":[["I have a lot of homework tonight.","homework"]],"subject":[["My favourite subject is history.","subject"]],"class":[["There are twenty students in my class.","class"]],"course":[["I am taking a course in data analysis.","course"]],"library":[["I study in the library.","library"]],"pen":[["Can I borrow your pen?","pen"]],"pencil":[["He wrote the answer with a pencil.","pencil"]],"paper":[["I need a sheet of paper.","paper"]],"book":[["I am reading a good book.","book"]],"newspaper":[["He reads the newspaper every morning.","newspaper"]],"magazine":[["She bought a fashion magazine.","magazine"]],"letter":[["I received a letter from the bank.","letter"]],"email":[["I will send you an email tomorrow.","email"]],"phone":[["My phone is out of battery.","phone"]],"computer":[["My computer is very slow today.","computer"]],"screen":[["The screen is broken.","screen"]],"keyboard":[["This keyboard is very comfortable.","keyboard"]],"internet":[["The internet is not working.","internet"]],"website":[["You can find the information on our website.","website"]],"password":[["I forgot my password.","password"]],"file":[["I saved the file on my computer.","file"]],"photo":[["She took a photo of the sunset.","photo"]],"camera":[["He bought a new camera.","camera"]],"music":[["I listen to music on the bus.","music"]],"song":[["This is my favourite song.","song"]],"film":[["We watched a funny film last night.","film"]],"game":[["The children are playing a game.","game"]],"team":[["Our team won the match.","team"]],"market":[["We buy fresh fruit at the market.","market"]],"supermarket":[["I go to the supermarket on Saturday.","supermarket"]],"cash":[["Do you take cash or card?","cash"]],"credit card":[["Can I pay by credit card?","credit card"]],"receipt":[["Can I have the receipt, please?","receipt"]],"discount":[["There is a discount on shoes today.","discount"]],"sale":[["Everything is on sale this week.","sale"]],"size":[["What size do you wear?","size"]],"change":[["I need to change my plans.","change"]],"bring":[["Please bring your passport tomorrow.","bring"]],"call":[["I will call you tonight.","call"]],"catch":[["I run to catch the bus.","catch"]],"check":[["Please check your email.","check"]],"climb":[["We want to climb the hill.","climb"]],"count":[["Count the money again.","Count"]],"cut":[["Cut the bread into slices.","Cut"]],"dance":[["They dance every Friday evening.","dance"]],"draw":[["She likes to draw animals.","draw"]],"drive":[["I drive to work every day.","drive"]],"fall":[["Be careful not to fall on the ice.","fall"]],"feel":[["I feel tired today.","feel"]],"fill":[["Please fill the glass with water.","fill"]],"finish":[["I will finish the report today.","finish"]],"fly":[["I want to fly to Spain in the summer.","fly"]],"follow":[["Follow me, I know the way.","Follow"]],"hold":[["Can you hold my bag for a minute?","hold"]],"hope":[["I hope you feel better soon.","hope"]],"hurt":[["My back hurts.","hurts"]],"jump":[["The children jump on the bed.","jump"]],"kiss":[["She wants to kiss him goodbye.","kiss"]],"laugh":[["His jokes always make me laugh.","laugh"]],"listen":[["Please listen carefully to this word.","listen"]],"look":[["Look at the beautiful sky!","Look"]],"move":[["I want to move to a bigger flat.","move"]],"pass":[["Can you pass me the salt?","pass"]],"pick":[["Pick a card, any card.","Pick"]],"play":[["The boys play football in the park.","play"]],"pull":[["You have to pull the door.","pull"]],"push":[["Push the button to start the machine.","Push"]],"put":[["Put your keys on the table.","Put"]],"reach":[["I cannot reach the top shelf.","reach"]],"return":[["I will return the book tomorrow.","return"]],"ride":[["I like to ride a bike on weekends.","ride"]],"ring":[["The phone began to ring.","ring"]],"save":[["Save the file before you close it.","Save"]],"say":[["Can you say that again, please?","say"]],"send":[["I will send you the photo.","send"]],"show":[["Show me your new phone.","Show"]],"sing":[["She likes to sing in the shower.","sing"]],"sit":[["Please sit here next to me.","sit"]],"smile":[["She likes to smile at everyone.","smile"]],"stand":[["I have to stand on the bus every day.","stand"]],"start":[["The lesson will start soon.","start"]],"stay":[["We stay at a small hotel near the sea.","stay"]],"stop":[["Please stop the car here.","stop"]],"swim":[["Can you swim?","swim"]],"talk":[["We need to talk about the plan.","talk"]],"teach":[["She will teach me to cook.","teach"]],"tell":[["Tell me what happened.","Tell"]],"throw":[["Do not throw paper on the floor.","throw"]],"touch":[["Do not touch the hot oven.","touch"]],"try":[["I want to try this new coffee.","try"]],"turn":[["Turn left at the traffic lights.","Turn"]],"use":[["Can I use your phone?","use"]],"visit":[["We visit my grandmother every Sunday.","visit"]],"watch":[["I watch the news every evening.","watch"]],"win":[["I hope our team will win.","win"]],"shout":[["There is no need to shout.","shout"]],"whisper":[["Please whisper, the baby is sleeping.","whisper"]],"cry":[["The baby began to cry.","cry"]],"wake up":[["I wake up at six every morning.","wake up"]],"get up":[["I get up early on weekdays.","get up"]],"sit down":[["Please sit down and relax.","sit down"]],"look for":[["I am looking for my keys.","looking for"]],"look after":[["She looks after her little brother.","looks after"]],"turn on":[["Please turn on the light.","turn on"]],"turn off":[["Turn off the computer before you leave.","Turn off"]],"pick up":[["Can you pick up the children from school?","pick up"]],"put on":[["Put on your coat, it is cold.","Put on"]],"take off":[["Take off your shoes at the door.","Take off"]],"come back":[["When will you come back?","come back"]],"go out":[["Let's go out tonight.","go out"]],"give back":[["Please give back my book.","give back"]],"find out":[["I want to find out the truth.","find out"]],"fill in":[["Please fill in this form.","fill in"]],"wait for":[["I am waiting for the bus.","waiting for"]],"tall":[["My brother is very tall.","tall"]],"short":[["The film was short but funny.","short"]],"thin":[["The wall is very thin.","thin"]],"fat":[["He is afraid of getting fat.","fat"]],"heavy":[["This bag is very heavy.","heavy"]],"light":[["The box is very light.","light"]],"strong":[["He is a strong man.","strong"]],"weak":[["I feel weak after the flu.","weak"]],"rich":[["She is a rich businesswoman.","rich"]],"poor":[["The family was very poor.","poor"]],"young":[["She is too young to drive.","young"]],"clever":[["He is a clever boy.","clever"]],"stupid":[["That was a stupid mistake.","stupid"]],"funny":[["My brother is very funny.","funny"]],"serious":[["Is it a serious problem?","serious"]],"kind":[["She is a kind person.","kind"]],"rude":[["It is rude to interrupt people.","rude"]],"polite":[["The waiter was very polite.","polite"]],"friendly":[["Our neighbours are very friendly.","friendly"]],"lazy":[["I feel lazy on Sundays.","lazy"]],"shy":[["He is too shy to speak English.","shy"]],"proud":[["I am proud of my son.","proud"]],"sad":[["The film was very sad.","sad"]],"lonely":[["She felt lonely in the big city.","lonely"]],"nervous":[["I am nervous before the exam.","nervous"]],"excited":[["The children are excited about the trip.","excited"]],"surprised":[["I was surprised by the news.","surprised"]],"worried":[["She is worried about her exam.","worried"]],"pleased":[["I am pleased to meet you.","pleased"]],"interesting":[["The book is very interesting.","interesting"]],"exciting":[["It was an exciting match.","exciting"]],"terrible":[["The weather was terrible.","terrible"]],"wonderful":[["We had a wonderful holiday.","wonderful"]],"perfect":[["The weather is perfect today.","perfect"]],"wrong":[["Sorry, I took the wrong bus.","wrong"]],"right":[["Yes, that is the right answer.","right"]],"true":[["Is it true that you are moving?","true"]],"false":[["The answer is false.","false"]],"possible":[["Is it possible to change the date?","possible"]],"impossible":[["It is impossible to finish this today.","impossible"]],"ready":[["Dinner is ready.","ready"]],"sure":[["Are you sure about that?","sure"]],"safe":[["The city is very safe at night.","safe"]],"dark":[["It gets dark early in winter.","dark"]],"bright":[["The room is bright and clean.","bright"]],"loud":[["The music is too loud.","loud"]],"soft":[["The bed is very soft.","soft"]],"hard":[["The bread is hard.","hard"]],"sharp":[["Be careful, the knife is sharp.","sharp"]],"smooth":[["The surface is smooth.","smooth"]],"flat":[["The road is flat here.","flat"]],"round":[["The table is round.","round"]],"straight":[["Go straight and then turn right.","straight"]],"deep":[["The lake is very deep.","deep"]],"wide":[["The river is wide here.","wide"]],"narrow":[["The street is very narrow.","narrow"]],"high":[["The mountain is very high.","high"]],"low":[["The price is low.","low"]],"actor":[["He is a famous actor.","actor"]],"age":[["What is your age?","age"]],"air":[["The air is fresh in the forest.","air"]],"area":[["It is a quiet area of the city.","area"]],"base":[["The company has its base in Riga.","base"]],"top":[["She put the book on the top shelf.","top"]],"bottom":[["The keys are at the bottom of my bag.","bottom"]],"side":[["Walk on the left side of the road.","side"]],"button":[["Press the green button.","button"]],"centre":[["The hotel is in the centre of the city.","centre"]],"colour":[["What colour is your car?","colour"]],"farm":[["They live on a farm.","farm"]],"farmer":[["The farmer has many cows.","farmer"]],"fence":[["The dog jumped over the fence.","fence"]],"gas":[["We use gas for cooking.","gas"]],"gold":[["She wore a gold ring.","gold"]],"silver":[["He gave her a silver necklace.","silver"]],"grass":[["The children lie on the grass.","grass"]],"tree":[["There is a big tree in our garden.","tree"]],"flower":[["She gave me a beautiful flower.","flower"]],"leaf":[["A yellow leaf fell on the table.","leaf"]],"seed":[["Plant the seed in the soil.","seed"]],"root":[["The root of the tree is old.","root"]],"hole":[["There is a hole in my sock.","hole"]],"length":[["What is the length of the room?","length"]],"height":[["The height of the wall is two metres.","height"]],"meal":[["Breakfast is the most important meal.","meal"]],"metal":[["The door is made of metal.","metal"]],"metre":[["The room is four metres long.","metres"]],"kilometre":[["I run five kilometres every morning.","kilometres"]],"kilogram":[["I bought a kilogram of apples.","kilogram"]],"litre":[["I drink two litres of water a day.","litres"]],"page":[["Open your book at page ten.","page"]],"path":[["The path goes through the forest.","path"]],"pet":[["Do you have a pet?","pet"]],"pipe":[["The pipe is broken.","pipe"]],"pool":[["We swam in the pool.","pool"]],"post":[["I will post the letter tomorrow.","post"]],"queen":[["The queen lives in the castle.","queen"]],"king":[["The king was very old.","king"]],"mouse":[["A mouse ran across the floor.","mouse"]],"sauce":[["I like tomato sauce with pasta.","sauce"]],"shadow":[["The tree makes a long shadow.","shadow"]],"sink":[["The dishes are in the sink.","sink"]],"soil":[["The soil is rich and dark.","soil"]],"stamp":[["I need a stamp for this letter.","stamp"]],"string":[["Tie the box with a string.","string"]],"sunrise":[["We watched the sunrise from the hill.","sunrise"]],"sunset":[["The sunset was beautiful.","sunset"]],"tail":[["The dog wags its tail.","tail"]],"tap":[["Turn off the tap, please.","tap"]],"tongue":[["He burned his tongue on the hot soup.","tongue"]],"tower":[["We climbed the church tower.","tower"]],"toy":[["The child dropped his toy.","toy"]],"umbrella":[["Take an umbrella, it is raining.","umbrella"]],"wallet":[["I lost my wallet on the bus.","wallet"]],"weapon":[["The police found a weapon.","weapon"]],"wire":[["The wire is connected to the battery.","wire"]],"yard":[["The children are playing in the yard.","yard"]],"zero":[["It is zero degrees today.","zero"]],"bird":[["A bird is singing in the tree.","bird"]],"horse":[["She likes to ride a horse.","horse"]],"cow":[["The cow gives milk.","cow"]],"pig":[["The pig lives on a farm.","pig"]],"sheep":[["The sheep are on the hill.","sheep"]],"duck":[["The duck swims on the lake.","duck"]],"rabbit":[["The rabbit eats a carrot.","rabbit"]],"bee":[["A bee sat on the flower.","bee"]],"butterfly":[["A butterfly landed on my hand.","butterfly"]],"spider":[["There is a big spider on the wall.","spider"]],"snake":[["He is afraid of the snake.","snake"]],"wolf":[["A wolf lives in the forest.","wolf"]],"fox":[["The fox ran across the road.","fox"]],"deer":[["A deer stood in the field.","deer"]],"elephant":[["The elephant is very big.","elephant"]],"lion":[["The lion is the king of animals.","lion"]],"tiger":[["The tiger is a dangerous animal.","tiger"]],"monkey":[["The monkey ate a banana.","monkey"]],"frog":[["A frog jumped into the water.","frog"]],"sentence":[["Please read the sentence aloud.","sentence"]],"word":[["I do not know this word.","word"]],"alphabet":[["The English alphabet has twenty-six letters.","alphabet"]],"grammar":[["English grammar is not very difficult.","grammar"]],"dictionary":[["Look up the word in the dictionary.","dictionary"]],"pronunciation":[["Her pronunciation is very clear.","pronunciation"]],"accent":[["He has a strong accent.","accent"]],"translation":[["I need a translation of this letter.","translation"]],"achieve":[["She worked hard to achieve her goal.","achieve"]],"advice":[["Can I ask you for some advice?","advice"]],"agree":[["I agree with you about the price.","agree"]],"allow":[["They do not allow dogs in the shop.","allow"]],"although":[["Although it was late, we kept working.","Although"]],"ability":[["He has the ability to learn quickly.","ability"]],"attitude":[["Her positive attitude helps the whole team.","attitude"]],"benefit":[["Regular exercise has many health benefits.","benefits"],["There are many benefits to this plan.","benefits"]],"challenge":[["Learning a new language is a big challenge.","challenge"]],"compare":[["Let's compare the two offers.","compare"]],"complain":[["Customers often complain about the delivery.","complain"]],"confident":[["I feel confident about the exam.","confident"]],"consider":[["Please consider my suggestion.","consider"]],"continue":[["We will continue the meeting after lunch.","continue"]],"control":[["The driver lost control of the car.","control"]],"creative":[["She has a very creative mind.","creative"]],"damage":[["The storm caused serious damage.","damage"]],"depend":[["It depends on the weather.","depends"]],"develop":[["The company wants to develop a new product.","develop"]],"discuss":[["We need to discuss this problem.","discuss"]],"effort":[["Thank you for your effort.","effort"]],"encourage":[["Teachers should encourage students to ask questions.","encourage"]],"environment":[["We must protect the environment.","environment"]],"experience":[["I have five years of work experience.","experience"]],"explain":[["Can you explain this word to me?","explain"]],"fail":[["I was afraid I would fail the exam.","fail"]],"fix":[["Can you fix my computer?","fix"]],"improve":[["I want to improve my English.","improve"]],"increase":[["Prices increase every year.","increase"]],"decrease":[["The number of customers began to decrease.","decrease"]],"influence":[["Friends have a big influence on teenagers.","influence"]],"install":[["I need to install a new program.","install"]],"introduce":[["Let me introduce my colleague.","introduce"]],"knowledge":[["He has a good knowledge of cars.","knowledge"]],"manage":[["She manages a team of ten people.","manages"]],"opinion":[["In my opinion, this is a good plan.","opinion"]],"opportunity":[["This job is a great opportunity.","opportunity"]],"order":[["We would like to order two coffees.","order"]],"prefer":[["I prefer tea to coffee.","prefer"]],"prepare":[["I need to prepare for the interview.","prepare"]],"prevent":[["Good tyres help prevent accidents.","prevent"]],"produce":[["The factory can produce a thousand cars a year.","produce"]],"promise":[["I promise to call you tomorrow.","promise"]],"provide":[["The hotel will provide breakfast.","provide"]],"reduce":[["We want to reduce our costs.","reduce"]],"refuse":[["He refused to pay the bill.","refused"]],"relationship":[["They have a good relationship.","relationship"]],"request":[["Please send your request by email.","request"]],"require":[["This job requires good English.","requires"]],"responsible":[["Who is responsible for this project?","responsible"]],"result":[["The result of the test was good.","result"]],"risk":[["There is a risk of rain.","risk"]],"solve":[["We need to solve this problem quickly.","solve"]],"spend":[["I spend too much money on coffee.","spend"]],"suggest":[["I suggest we meet at six.","suggest"]],"support":[["My family supports me.","supports"]],"treat":[["The doctor will treat your cough.","treat"]],"trust":[["I trust my colleagues.","trust"]],"unfortunately":[["Unfortunately, I cannot come tomorrow.","Unfortunately"]],"however":[["I like the flat; however, it is too expensive.","however"]],"wonder":[["I wonder where she is.","wonder"]],"deadline":[["The deadline for the report is Friday.","deadline"]],"salary":[["His salary is not very high.","salary"]],"invoice":[["Please send me the invoice by email.","invoice"]],"report":[["I need to write a report.","report"]],"delivery":[["The delivery will arrive tomorrow.","delivery"]],"warranty":[["The car has a two-year warranty.","warranty"]],"engine":[["The engine makes a strange noise.","engine"]],"brake":[["Press the brake slowly.","brake"]],"tyre":[["I need to change a tyre.","tyre"]],"repair":[["The repair will take two days.","repair"]],"insurance":[["You need car insurance.","insurance"]],"spare part":[["We need to order a spare part.","spare part"]],"accept":[["Please accept my apology.","accept"]],"admit":[["He admitted his mistake.","admitted"]],"afford":[["I cannot afford a new car.","afford"]],"announce":[["They will announce the winner tomorrow.","announce"]],"apologise":[["I want to apologise for being late.","apologise"]],"appear":[["The sun began to appear behind the clouds.","appear"]],"apply":[["I want to apply for this job.","apply"]],"arrange":[["I will arrange a meeting for Monday.","arrange"]],"attach":[["Please attach the file to your email.","attach"]],"attack":[["The dog may attack if you run.","attack"]],"avoid":[["Try to avoid the city centre at five o'clock.","avoid"]],"bake":[["I like to bake bread on Sundays.","bake"]],"bear":[["I cannot bear this noise.","bear"]],"beat":[["Our team beat them three to one.","beat"]],"belong":[["This book belongs to my sister.","belongs"]],"bend":[["Bend your knees when you lift the box.","Bend"]],"blame":[["Do not blame me for this.","blame"]],"blow":[["The wind began to blow hard.","blow"]],"boil":[["Boil the water for five minutes.","Boil"]],"bother":[["Sorry to bother you, but I have a question.","bother"]],"breathe":[["It is hard to breathe in this room.","breathe"]],"burn":[["Be careful not to burn your hand.","burn"]],"calculate":[["Can you calculate the total price?","calculate"]],"cancel":[["We had to cancel the meeting.","cancel"]],"cause":[["Smoking can cause many diseases.","cause"],["What was the cause of the problem?","cause"]],"celebrate":[["We celebrate my birthday on Saturday.","celebrate"]],"charge":[["They charge ten euros for parking.","charge"]],"cheat":[["You must not cheat in the exam.","cheat"]],"collect":[["She likes to collect old stamps.","collect"]],"combine":[["You can combine these two colours.","combine"]],"communicate":[["It is easy to communicate by email.","communicate"]],"concentrate":[["I cannot concentrate with the noise.","concentrate"]],"confirm":[["Please confirm your booking by email.","confirm"]],"connect":[["Connect the cable to the computer.","Connect"]],"contain":[["This box contains old books.","contains"]],"copy":[["Please copy this document for me.","copy"]],"cover":[["Cover the soup with a lid.","Cover"]],"crash":[["The two cars crash at the corner.","crash"]],"create":[["We want to create a new website.","create"]],"cross":[["Look both ways before you cross the road.","cross"]],"deliver":[["We deliver the goods within two days.","deliver"]],"deny":[["He denied everything.","denied"]],"describe":[["Can you describe the problem?","describe"]],"deserve":[["You deserve a rest.","deserve"]],"destroy":[["The fire destroyed the old house.","destroyed"]],"discover":[["They discover a new way to save energy.","discover"]],"divide":[["Divide the cake into eight pieces.","Divide"]],"doubt":[["I doubt that he will come.","doubt"]],"dream":[["I dream of a house by the sea.","dream"]],"earn":[["He earns a good salary.","earns"]],"employ":[["The company employs two hundred people.","employs"]],"enter":[["Please enter the room quietly.","enter"]],"escape":[["The prisoner tried to escape.","escape"]],"exist":[["Does life exist on other planets?","exist"]],"expect":[["I expect good results.","expect"]],"feed":[["Please feed the cat at six.","feed"]],"fit":[["These shoes do not fit me.","fit"]],"force":[["Nobody can force you to do it.","force"]],"forgive":[["Please forgive me for being late.","forgive"]],"freeze":[["The water will freeze at night.","freeze"]],"gain":[["She wants to gain more experience.","gain"]],"gather":[["People gather in the square.","gather"]],"grow":[["Tomatoes grow well in warm weather.","grow"]],"guess":[["Guess what happened to me today!","Guess"]],"hang":[["Hang your coat in the hall.","Hang"]],"happen":[["What happened to your car?","happened"]],"hate":[["I hate waiting in queues.","hate"]],"hide":[["He tried to hide the gift.","hide"]],"hire":[["We want to hire a new assistant.","hire"]],"hit":[["The ball hit the window.","hit"]],"identify":[["Can you identify the problem?","identify"]],"ignore":[["Do not ignore the warning signs.","ignore"]],"imagine":[["Can you imagine living on a boat?","imagine"]],"impress":[["Her work really impressed me.","impressed"]],"include":[["The price includes breakfast.","includes"]],"indicate":[["The arrow indicates the exit.","indicates"]],"inform":[["Please inform me about the change.","inform"]],"insist":[["I insist on paying for dinner.","insist"]],"intend":[["I intend to start a new course.","intend"]],"involve":[["The job involves a lot of travel.","involves"]],"knock":[["Please knock before you enter.","knock"]],"lead":[["This road leads to the sea.","leads"]],"lift":[["Can you help me lift this table?","lift"]],"link":[["Click on the link below.","link"]],"lock":[["Do not forget to lock the door.","lock"]],"match":[["The colours do not match.","match"]],"mean":[["What does this word mean?","mean"]],"measure":[["Measure the room before you buy a carpet.","Measure"]],"melt":[["The ice will melt in the sun.","melt"]],"mention":[["He did not mention the price.","mention"]],"mix":[["Mix the flour and the eggs.","Mix"]],"notice":[["Did you notice the new sign?","notice"]],"offer":[["They offer free coffee to customers.","offer"]],"operate":[["The machine operates quietly.","operates"]],"owe":[["I owe you ten euros.","owe"]],"pack":[["I need to pack my suitcase.","pack"]],"paint":[["We want to paint the kitchen yellow.","paint"]],"park":[["You cannot park here.","park"]],"perform":[["The band will perform on Friday.","perform"]],"pour":[["Pour some water into the glass.","Pour"]],"practise":[["I practise English every day.","practise"]],"praise":[["The teacher praised the students.","praised"]],"pretend":[["The children pretend to be pirates.","pretend"]],"protect":[["Wear a hat to protect your head.","protect"]],"prove":[["Can you prove it?","prove"]],"publish":[["They will publish the book in May.","publish"]],"punish":[["You should not punish children for mistakes.","punish"]],"qualify":[["He needs more training to qualify as an engineer.","qualify"]],"quit":[["He decided to quit his job.","quit"]],"raise":[["They raise two children.","raise"]],"rely":[["You can rely on me.","rely"]],"remind":[["Please remind me to call him.","remind"]],"remove":[["Please remove your shoes.","remove"]],"replace":[["We need to replace the old computer.","replace"]],"research":[["Scientists research new medicines.","research"]],"reserve":[["I want to reserve a table for two.","reserve"]],"rest":[["You should rest for a few days.","rest"]],"retire":[["He will retire next year.","retire"]],"review":[["I will review the document tonight.","review"]],"rush":[["There is no need to rush.","rush"]],"satisfy":[["The customer is not satisfied with the service.","satisfied"]],"scare":[["The noise may scare the dog.","scare"]],"select":[["Please select your language.","select"]],"separate":[["We need to separate paper from plastic.","separate"]],"serve":[["The restaurant serves breakfast until eleven.","serves"]],"settle":[["Let's settle this problem today.","settle"]],"shake":[["The earthquake made the house shake.","shake"]],"share":[["We share a flat with two students.","share"]],"shine":[["The sun shines every day in summer.","shines"]],"shoot":[["The police did not shoot.","shoot"]],"sign":[["Please sign here.","sign"]],"slip":[["Be careful not to slip on the ice.","slip"]],"smell":[["The kitchen smells wonderful.","smells"]],"smoke":[["He tries not to smoke at home.","smoke"]],"sort":[["Please sort the letters by date.","sort"]],"spell":[["How do you spell your name?","spell"]],"spread":[["The news spread quickly.","spread"]],"steal":[["Someone tried to steal my bike.","steal"]],"stick":[["Stick the stamp on the envelope.","Stick"]],"stir":[["Stir the soup slowly.","Stir"]],"stretch":[["Stretch your arms above your head.","Stretch"]],"succeed":[["I hope you succeed in your new job.","succeed"]],"suffer":[["Many people suffer from stress.","suffer"]],"suit":[["This colour suits you.","suits"]],"supply":[["The farm supplies the shop with eggs.","supplies"]],"surprise":[["I want to surprise my mother.","surprise"]],"survive":[["Few plants survive in the desert.","survive"]],"suspect":[["I suspect that he is lying.","suspect"]],"swallow":[["It hurts to swallow.","swallow"]],"switch":[["Switch off your phone in the cinema.","Switch"]],"tear":[["Be careful not to tear the paper.","tear"]],"test":[["We test every product.","test"]],"thank":[["I want to thank you for your help.","thank"]],"tie":[["Tie your shoes.","Tie"]],"translate":[["Can you translate this email?","translate"]],"trick":[["He tried to trick me.","trick"]],"unlock":[["Unlock the door with this key.","Unlock"]],"upset":[["The bad news upset her.","upset"]],"vote":[["Everyone can vote on Sunday.","vote"]],"warn":[["The doctor warned him to stop smoking.","warned"]],"wash":[["Wash your hands before dinner.","Wash"]],"waste":[["Do not waste water.","waste"]],"weigh":[["I weigh myself every morning.","weigh"]],"welcome":[["We welcome new customers every day.","welcome"]],"wipe":[["Wipe the table with a cloth.","Wipe"]],"wish":[["I wish you a happy birthday.","wish"]],"wrap":[["Wrap the gift in paper.","Wrap"]],"give up":[["I will never give up.","give up"]],"set up":[["They set up a small company.","set up"]],"carry on":[["Please carry on with your work.","carry on"]],"break down":[["My car broke down on the way to work.","broke down"]],"break up":[["They decided to break up.","break up"]],"bring up":[["She brought up two children alone.","brought up"]],"call off":[["They called off the meeting.","called off"]],"check in":[["We check in at the hotel at three.","check in"]],"check out":[["We check out at eleven.","check out"]],"cheer up":[["Cheer up, it is not so bad!","Cheer up"]],"come across":[["I came across an old photo.","came across"]],"cut down":[["I want to cut down on sugar.","cut down"]],"deal with":[["I have to deal with a difficult customer.","deal with"]],"figure out":[["I cannot figure out this problem.","figure out"]],"get along":[["I get along well with my colleagues.","get along"]],"get over":[["It took her a week to get over the flu.","get over"]],"go on":[["Please go on, I am listening.","go on"]],"hold on":[["Hold on, I will be back in a minute.","Hold on"]],"keep up":[["It is hard to keep up with the news.","keep up"]],"look forward to":[["I look forward to seeing you.","look forward to"]],"make up":[["He made up an excuse.","made up"]],"move on":[["It is time to move on.","move on"]],"point out":[["He pointed out a mistake in the report.","pointed out"]],"run out":[["We have run out of milk.","run out"]],"show up":[["He did not show up for the meeting.","show up"]],"sort out":[["We need to sort out this problem.","sort out"]],"take over":[["Who will take over his job?","take over"]],"throw away":[["Do not throw away this paper.","throw away"]],"try on":[["Can I try on this jacket?","try on"]],"turn down":[["They turned down my offer.","turned down"]],"work out":[["Things will work out well.","work out"]],"available":[["Is this room available on Friday?","available"]],"aware":[["I was not aware of the problem.","aware"]],"basic":[["You need only basic English for this job.","basic"]],"careless":[["A careless mistake cost us a lot of money.","careless"]],"certain":[["I am certain that he will come.","certain"]],"common":[["This is a very common mistake.","common"]],"complete":[["Please complete the form and send it back.","complete"]],"complicated":[["The rules are too complicated.","complicated"]],"convenient":[["The hotel is in a convenient location.","convenient"]],"current":[["What is your current address?","current"]],"curious":[["Children are curious about everything.","curious"]],"delicious":[["The soup was absolutely delicious.","delicious"]],"difficult":[["It is difficult to learn a language alone.","difficult"]],"direct":[["There is a direct train to Riga.","direct"]],"disappointed":[["I was disappointed with the service.","disappointed"]],"efficient":[["This new machine is very efficient.","efficient"]],"embarrassed":[["She felt embarrassed about her mistake.","embarrassed"]],"enormous":[["They live in an enormous house.","enormous"]],"equal":[["All people are equal.","equal"]],"essential":[["Water is essential for life.","essential"]],"exact":[["Do you know the exact time?","exact"]],"extra":[["I need an extra chair.","extra"]],"familiar":[["Her face looks familiar.","familiar"]],"famous":[["Riga is famous for its old town.","famous"]],"fascinating":[["The museum was fascinating.","fascinating"]],"flexible":[["My working hours are flexible.","flexible"]],"foreign":[["She speaks three foreign languages.","foreign"]],"frequent":[["There are frequent delays on this line.","frequent"]],"furious":[["He was furious about the delay.","furious"]],"general":[["In general, I like my job.","general"]],"generous":[["It was very generous of you to help.","generous"]],"genuine":[["This is a genuine leather bag.","genuine"]],"global":[["Climate change is a global problem.","global"]],"grateful":[["I am grateful for your help.","grateful"]],"guilty":[["I feel guilty about forgetting her birthday.","guilty"]],"harmful":[["Too much sun is harmful for your skin.","harmful"]],"helpful":[["The staff were very helpful.","helpful"]],"honest":[["Please give me your honest opinion.","honest"]],"huge":[["They have a huge garden.","huge"]],"independent":[["She wants to be independent.","independent"]],"inexpensive":[["It is a good and inexpensive hotel.","inexpensive"]],"jealous":[["He is jealous of his brother.","jealous"]],"joyful":[["It was a joyful celebration.","joyful"]],"latest":[["Have you seen the latest news?","latest"]],"likely":[["It is likely to rain tomorrow.","likely"]],"local":[["We buy local food at the market.","local"]],"main":[["The main road is closed.","main"]],"modern":[["They live in a modern flat.","modern"]],"natural":[["Wood is a natural material.","natural"]],"necessary":[["It is necessary to book in advance.","necessary"]],"negative":[["He has a negative attitude.","negative"]],"normal":[["It is normal to feel nervous.","normal"]],"obvious":[["The answer is obvious.","obvious"]],"official":[["This is an official document.","official"]],"original":[["Is this the original photo?","original"]],"particular":[["I have no particular plans for the weekend.","particular"]],"personal":[["This is a personal question.","personal"]],"popular":[["It is a very popular restaurant.","popular"]],"positive":[["Try to stay positive.","positive"]],"powerful":[["It is a powerful engine.","powerful"]],"practical":[["She gave me some practical advice.","practical"]],"precious":[["Time is precious.","precious"]],"private":[["This is a private party.","private"]],"professional":[["He is a professional driver.","professional"]],"public":[["Public transport is cheap in the city.","Public"]],"rare":[["This bird is very rare.","rare"]],"recent":[["In recent years, prices have increased.","recent"]],"regular":[["I have a regular customer who comes every week.","regular"]],"reliable":[["This car is very reliable.","reliable"]],"sensible":[["That is a sensible idea.","sensible"]],"sensitive":[["She is very sensitive to noise.","sensitive"]],"similar":[["Our phones are very similar.","similar"]],"simple":[["The instructions are simple.","simple"]],"sincere":[["Please accept my sincere thanks.","sincere"]],"single":[["I have a single room for two nights.","single"]],"social":[["Social media takes a lot of my time.","Social"]],"special":[["Today is a special day for us.","special"]],"successful":[["She is a successful businesswoman.","successful"]],"sudden":[["There was a sudden noise.","sudden"]],"suitable":[["This jacket is not suitable for winter.","suitable"]],"surprising":[["The result was surprising.","surprising"]],"tight":[["These shoes are too tight.","tight"]],"typical":[["It was a typical Monday morning.","typical"]],"unusual":[["That is an unusual name.","unusual"]],"useful":[["This app is really useful.","useful"]],"valuable":[["The ring is very valuable.","valuable"]],"various":[["They sell various kinds of cheese.","various"]],"violent":[["The storm was very violent.","violent"]],"visible":[["The mountains are visible from here.","visible"]],"whole":[["I ate the whole cake.","whole"]],"willing":[["Are you willing to work on Saturdays?","willing"]],"accurately":[["Please write the numbers accurately.","accurately"]],"actually":[["I actually like my job.","actually"]],"apparently":[["Apparently, the shop is closed today.","Apparently"]],"carefully":[["Read the contract carefully.","carefully"]],"certainly":[["I will certainly call you tomorrow.","certainly"]],"clearly":[["Please speak clearly.","clearly"]],"completely":[["I completely forgot about the meeting.","completely"]],"definitely":[["I will definitely come.","definitely"]],"eventually":[["We eventually found the right road.","eventually"]],"exactly":[["That is exactly what I mean.","exactly"]],"extremely":[["I am extremely tired.","extremely"]],"fortunately":[["Fortunately, nobody was hurt.","Fortunately"]],"generally":[["Generally, I get up at six.","Generally"]],"immediately":[["Please come immediately.","immediately"]],"increasingly":[["Increasingly, people work from home.","Increasingly"]],"nearly":[["We are nearly there.","nearly"]],"normally":[["I normally walk to work.","normally"]],"obviously":[["Obviously, he did not listen.","Obviously"]],"particularly":[["I am particularly interested in cars.","particularly"]],"possibly":[["Could you possibly help me?","possibly"]],"properly":[["The machine is not working properly.","properly"]],"quickly":[["Please answer quickly.","quickly"]],"rarely":[["I rarely eat meat.","rarely"]],"recently":[["I recently changed my job.","recently"]],"slightly":[["The price is slightly higher.","slightly"]],"suddenly":[["Suddenly, the lights went out.","Suddenly"]],"totally":[["I totally agree with you.","totally"]],"usually":[["I usually have coffee in the morning.","usually"]],"absence":[["His absence was noticed.","absence"]],"access":[["Do you have access to the system?","access"]],"account":[["I need to open a bank account.","account"]],"action":[["We must take action now.","action"]],"activity":[["Swimming is my favourite activity.","activity"]],"address":[["What is your email address?","address"]],"adult":[["The ticket costs ten euros for an adult.","adult"]],"advantage":[["One advantage of this job is the free parking.","advantage"]],"adventure":[["Our trip was a real adventure.","adventure"]],"agreement":[["We signed the agreement yesterday.","agreement"]],"amount":[["What is the total amount?","amount"]],"analysis":[["The analysis shows a clear trend.","analysis"]],"appearance":[["Appearance is not the most important thing.","Appearance"]],"approach":[["We need a new approach to this problem.","approach"]],"argument":[["They had an argument about money.","argument"]],"arrangement":[["We made an arrangement to meet at six.","arrangement"]],"atmosphere":[["The restaurant has a nice atmosphere.","atmosphere"]],"audience":[["The audience clapped for a long time.","audience"]],"average":[["The average price is ten euros.","average"]],"balance":[["It is hard to find a balance between work and life.","balance"]],"budget":[["We have a small budget for the project.","budget"]],"career":[["She has a successful career in banking.","career"]],"chance":[["This is your last chance.","chance"]],"choice":[["You have a choice between two options.","choice"]],"climate":[["The climate here is mild.","climate"]],"colleague":[["My colleague is on holiday.","colleague"]],"community":[["The local community helped us.","community"]],"competition":[["There is a lot of competition in this market.","competition"]],"condition":[["The car is in good condition.","condition"]],"connection":[["I have a bad internet connection.","connection"]],"contract":[["I signed a contract for one year.","contract"]],"conversation":[["We had a long conversation.","conversation"]],"cost":[["The cost of living is rising.","cost"]],"culture":[["I am interested in other cultures.","cultures"]],"data":[["We collect data about customers.","data"]],"decision":[["It was a difficult decision.","decision"]],"demand":[["There is a high demand for electric cars.","demand"]],"department":[["She works in the finance department.","department"]],"detail":[["Please send me more details.","details"]],"difference":[["What is the difference between these two?","difference"]],"direction":[["We went in the wrong direction.","direction"]],"distance":[["The distance between the cities is two hundred kilometres.","distance"]],"education":[["Education is very important.","Education"]],"emergency":[["Call this number in an emergency.","emergency"]],"energy":[["Solar panels produce clean energy.","energy"]],"event":[["The event starts at eight.","event"]],"evidence":[["There is no evidence for this.","evidence"]],"example":[["Can you give me an example?","example"]],"exchange":[["You can exchange money at the bank.","exchange"]],"expense":[["Travel expenses are paid by the company.","expenses"]],"fact":[["That is an interesting fact.","fact"]],"factor":[["Price is an important factor.","factor"]],"feature":[["This phone has many useful features.","features"]],"figure":[["The sales figures are good.","figures"]],"finance":[["He works in finance.","finance"]],"freedom":[["Freedom is important to me.","Freedom"]],"goal":[["My goal is to speak English fluently.","goal"]],"government":[["The government announced new rules.","government"]],"growth":[["We expect growth next year.","growth"]],"habit":[["Smoking is a bad habit.","habit"]],"harm":[["The storm did serious harm to the crops.","harm"]],"income":[["Her income is not very high.","income"]],"industry":[["He works in the car industry.","industry"]],"information":[["I need more information about the course.","information"]],"issue":[["We have an issue with the delivery.","issue"]],"language":[["How many languages do you speak?","languages"]],"law":[["It is against the law.","law"]],"level":[["My level of English is low.","level"]],"limit":[["The speed limit here is fifty.","limit"]],"loss":[["The company reported a loss.","loss"]],"manager":[["The manager wants to see you.","manager"]],"method":[["This is a new method of learning.","method"]],"moment":[["Wait a moment, please.","moment"]],"mood":[["She is in a good mood today.","mood"]],"nature":[["I love walking in nature.","nature"]],"need":[["There is no need to hurry.","need"]],"network":[["The network is down.","network"]],"number":[["What is your phone number?","number"]],"objective":[["Our objective is to save money.","objective"]],"option":[["You have two options.","options"]],"pattern":[["I see a pattern in the numbers.","pattern"]],"percentage":[["What percentage of people agree?","percentage"]],"period":[["The offer is valid for a short period.","period"]],"plan":[["What is your plan for tomorrow?","plan"]],"policy":[["The company has a strict policy.","policy"]],"pressure":[["I work well under pressure.","pressure"]],"price":[["The price is too high.","price"]],"process":[["The whole process takes two weeks.","process"]],"product":[["This product is made in Latvia.","product"]],"profit":[["The company made a big profit last year.","profit"]],"progress":[["I am making good progress.","progress"]],"project":[["We are working on a new project.","project"]],"property":[["The property is for sale.","property"]],"purpose":[["What is the purpose of your visit?","purpose"]],"quality":[["The quality of this product is excellent.","quality"]],"quantity":[["We ordered a large quantity of parts.","quantity"]],"reason":[["Is there a reason for this delay?","reason"]],"record":[["He broke the world record.","record"]],"region":[["This region is famous for its wine.","region"]],"rule":[["Please follow the rules.","rules"]],"safety":[["Safety is our first priority.","Safety"]],"schedule":[["My schedule is very full this week.","schedule"]],"section":[["Read the next section carefully.","section"]],"service":[["The service in this hotel is excellent.","service"]],"situation":[["The situation is getting better.","situation"]],"skill":[["Speaking is the most difficult skill.","skill"]],"society":[["Society is changing quickly.","Society"]],"solution":[["We found a simple solution.","solution"]],"source":[["What is the source of this information?","source"]],"standard":[["The standard price is fifty euros.","standard"]],"statement":[["The company made a short statement.","statement"]],"strategy":[["We need a clear strategy.","strategy"]],"stress":[["Too much stress is bad for your health.","stress"]],"success":[["Hard work leads to success.","success"]],"system":[["The system is not working.","system"]],"target":[["Our target is two hundred customers.","target"]],"task":[["My first task today is to write a report.","task"]],"technology":[["New technology changes our lives.","technology"]],"theory":[["That is only a theory.","theory"]],"tradition":[["It is a Latvian tradition.","tradition"]],"training":[["He is in training for a marathon.","training"]],"trend":[["There is a new trend in fashion.","trend"]],"value":[["The value of the house has increased.","value"]],"variety":[["The shop has a wide variety of cheese.","variety"]],"view":[["The view from the window is lovely.","view"]],"volume":[["Please turn down the volume.","volume"]],"wage":[["The minimum wage is going up.","wage"]]};
+/*SENTS_END*/
+
+/* ============ SAGLABĀŠANA ============ */
+const KEY='eng.v1';
+let S = JSON.parse(localStorage.getItem(KEY)||'null') || {cards:{},days:{}};
+DECK.forEach(([en,lv,l])=>{ if(!S.cards[en]) S.cards[en]={en,lv,lvl:l,ef:2.5,int:0,reps:0,due:0}; else if(!S.cards[en].lvl) S.cards[en].lvl=l; });
+DECK.forEach(([en,lv])=>{const c=S.cards[en];if(c&&c.lv!==lv)c.lv=lv;}); // tulkojumu labojumi nonāk arī esošajās kartītēs
+if(!S.v3){S.levels=['A2','B1','B2','C1'];S.npd=20;S.v3=1;}
+if(!S.levels)S.levels=['A2','B1','B2','C1'];
+if(!S.npd)S.npd=20;
+const active=c=>!c.lvl||(S.levels||['A2','B1','B2','C1']).includes(c.lvl);
+const save=()=>localStorage.setItem(KEY,JSON.stringify(S));
+const today=()=>new Date().toISOString().slice(0,10);
+const dayStat=()=>S.days[today()]||(S.days[today()]={new:0,done:0});
+const NEW_PER_DAY=()=>S.npd||20;
+
+/* ============ SM-2 ============ */
+function grade(c,q){ // q: 0 = vēlreiz, 3 = grūti, 4 = labi, 5 = viegli
+  if(q<3){c.reps=0;c.int=0;c.due=Date.now()+10*60000;}
+  else{
+    if(c.reps===0)c.int=1; else if(c.reps===1)c.int=3; else c.int=Math.round(c.int*c.ef);
+    if(q===5)c.int=Math.ceil(c.int*1.3);
+    c.reps++;
+    c.ef=Math.max(1.3,c.ef+0.1-(5-q)*(0.08+(5-q)*0.02));
+    c.due=Date.now()+c.int*864e5;
+  }
+  dayStat().done++; save();
+}
+const dueCards=()=>Object.values(S.cards).filter(c=>c.reps>0&&c.due<=Date.now());
+const LR={A2:1,B1:2,B2:3,C1:4};
+function hsh(s){let x=2166136261;for(const ch of s){x^=ch.charCodeAt(0);x=Math.imul(x,16777619);}return x>>>0;}
+// jaunie vārdi: pēc līmeņa (A2→C1), bet katrā līmenī tēmas jauktas
+const newCards=()=>Object.values(S.cards).filter(c=>c.reps===0&&c.due===0&&active(c)).sort((a,b)=>((LR[a.lvl]||0)-(LR[b.lvl]||0))||(hsh(a.en)-hsh(b.en)));
+function buildQueue(){
+  const d=dayStat();
+  const left=Math.max(0,NEW_PER_DAY()+(d.extra||0)-d.new);
+  const learn=(d.learn||[]).map(e=>S.cards[e]).filter(c=>c&&c.reps===0);
+  return [...dueCards(), ...learn, ...newCards().slice(0,left)];
+}
+
+/* ============ AUDIO ============ */
+let voice=null;
+function pickVoice(){
+  const v=speechSynthesis.getVoices();
+  voice=v.find(x=>/en-(GB|US)/i.test(x.lang)&&/Google|Natural|Online/i.test(x.name))||v.find(x=>/^en/i.test(x.lang))||null;
+}
+if('speechSynthesis' in window){pickVoice();speechSynthesis.onvoiceschanged=pickVoice;}
+function say(text,rate=0.9){
+  if(!('speechSynthesis' in window))return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang='en-GB'; if(voice)u.voice=voice; u.rate=rate;
+  speechSynthesis.speak(u);
+}
+
+/* ============ PALĪGFUNKCIJAS ============ */
+const $=s=>document.querySelector(s);
+const app=$('#app');
+function h(tag,attrs={},...kids){
+  const e=document.createElement(tag);
+  for(const[k,v]of Object.entries(attrs)){
+    if(k==='class')e.className=v; else if(k.startsWith('on'))e[k]=v; else e.setAttribute(k,v);
+  }
+  kids.flat().forEach(k=>e.append(k.nodeType?k:document.createTextNode(k)));
+  return e;
+}
+const norm=s=>s.toLowerCase().trim().replace(/[^a-z' ]/g,'').replace(/\s+/g,' ');
+function statsBar(){
+  const d=dayStat();
+  return h('div',{class:'stats'},
+    h('span',{class:'pill'},'Atkārtojami: '+dueCards().length),
+    h('span',{class:'pill'},'Jauni (mācāmie) šodien: '+d.new+'/'+(NEW_PER_DAY()+(d.extra||0))),
+    h('span',{class:'pill'},'Šodien izdarīts: '+d.done),
+    h('span',{class:'pill'},'Kopā kartīšu: '+Object.keys(S.cards).length));
+}
+
+/* ============ NAVIGĀCIJA ============ */
+const MODES={cards:'🃏 Kartītes',listen:'🎧 Klausies',test:'✍️ Tests',speak:'🎤 Runā',read:'📖 Lasi',more:'⚙️ Vēl'};
+let mode='cards';
+function go(m){
+  mode=m;
+  const nav=$('#nav'); nav.innerHTML='';
+  for(const[k,v]of Object.entries(MODES))nav.append(h('button',{class:k===m?'on':'',onclick:()=>go(k)},v));
+  app.innerHTML='';
+  ({cards:viewCards,listen:viewListen,test:viewTest,speak:viewSpeak,read:viewRead,more:viewMore})[m]();
+}
+
+/* ============ 1) KARTĪTES ============ */
+function viewCards(){
+  const q=buildQueue();
+  const xp=new Map(); // cik reizes šajā sesijā mācāmais vārds jau redzēts
+  app.append(statsBar());
+  app.append(h('div',{class:'row'},h('button',{class:'b y',onclick:triage},'⚡ Ātrā atlase (20 vārdi)')));
+  const todayL=(dayStat().learn||[]).map(e=>S.cards[e]).filter(Boolean);
+  const lastL=Object.values(S.cards).filter(c=>c.ft).sort((a,b)=>b.ft-a.ft).slice(0,30);
+  app.append(h('div',{class:'row'},
+    h('button',{class:'b alt',onclick:()=>repeatPass(todayL,'Šodienas vārdi')},'🔁 Šodienas vārdi ('+todayL.length+')'),
+    h('button',{class:'b alt',onclick:()=>repeatPass(lastL,'Pēdējie '+lastL.length+' vārdi')},'🔁 Pēdējie 30')));
+  if(!q.length){app.append(h('div',{class:'box'},h('div',{class:'big'},'🎉 Šodien viss!'),h('div',{class:'sub'},'Dienas limits sasniegts. Vari atkārtot vārdus (🔁), turpināt ar vēl jauniem vārdiem vai doties uz testiem.'),h('div',{class:'row'},h('button',{class:'b',onclick:()=>{const d=dayStat();d.extra=(d.extra||0)+20;save();go('cards');}},'➕ Vēl 20 jaunu vārdu šodien'),h('button',{class:'b alt',onclick:()=>go('test')},'✍️ Uz testu'))));return;}
+  const box=h('div',{class:'box'}); app.append(box);
+  function show(){
+    box.innerHTML='';
+    if(!q.length){go('cards');return;}
+    const c=q[0];
+    const isNew=c.reps===0&&c.due===0;
+    const learning=c.reps===0;
+    const x=xp.get(c)||0;
+    if(learning)box.append(h('div',{class:'sub'},'Mācāmais vārds — atkārtojums '+(x+1)+' no 3'));
+    box.append(h('div',{class:'big'},c.en));
+    box.append(h('div',{class:'row'},h('button',{class:'b alt',onclick:()=>say(c.en)},'🔊 Klausīties'),h('button',{class:'b alt',onclick:()=>say(c.en,0.55)},'🐢 Lēnāk')));
+    const ans=h('div',{class:'row'});
+    box.append(ans);
+    ans.append(h('button',{class:'b',onclick:reveal},'Rādīt atbildi'));
+    if(isNew)ans.append(h('button',{class:'b y',onclick:()=>{c.reps=3;c.int=30;c.due=Date.now()+30*864e5;dayStat().done++;save();q.shift();show();}},'Zinu jau ✓'));
+    say(c.en);
+    function reveal(){
+      ans.innerHTML='';
+      box.insertBefore(h('div',{class:'big',style:'color:var(--acc2)'},c.lv),ans);
+      const ex=(SENTS[c.en]||[])[0];
+      if(ex)box.insertBefore(h('div',{class:'sub',style:'cursor:pointer',onclick:()=>say(ex[0])},'🔊 '+ex[0]),ans);
+      const rate=(qv)=>()=>{
+        const d=dayStat();
+        if(isNew){d.new++;c.due=1;(d.learn=d.learn||[]).push(c.en);save();}
+        q.shift();
+        if(learning){
+          if(qv<3){grade(c,0);xp.set(c,0);q.splice(Math.min(2,q.length),0,c);}
+          else{
+            const nx=x+1;
+            if(nx<3){xp.set(c,nx);q.splice(Math.min(nx===1?4:10,q.length),0,c);save();}
+            else{grade(c,qv);if(!c.ft){c.ft=Date.now();save();}}
+          }
+        }else{
+          grade(c,qv);
+          if(qv<3){xp.set(c,1);q.splice(Math.min(3,q.length),0,c);}
+        }
+        show();
+      };
+      ans.append(h('button',{class:'b bad',onclick:rate(0)},'Vēlreiz'),h('button',{class:'b alt',onclick:rate(3)},'Grūti'),h('button',{class:'b ok',onclick:rate(4)},'Labi'),h('button',{class:'b y',onclick:rate(5)},'Viegli'));
+    }
+  }
+  show();
+}
+
+// Atkārtošana: pārskata jau mācītos vārdus (izruna + nozīme), neietekmē SM-2 grafiku
+function repeatPass(cards,title){
+  app.innerHTML='';
+  const box=h('div',{class:'box'});app.append(box);
+  if(!cards.length){box.append(h('div',{class:'sub'},'Šeit vēl nav vārdu — vispirms iemācies dažus kartītēs.'),h('div',{class:'row'},h('button',{class:'b alt',onclick:()=>go('cards')},'← Atpakaļ')));return;}
+  const q=cards.slice().sort(()=>Math.random()-0.5);
+  const total=q.length;let seen=0;
+  function show(){
+    box.innerHTML='';
+    if(!q.length){
+      box.append(h('div',{class:'big'},'✅ Atkārtots'),h('div',{class:'sub'},title+': '+total+' vārdi. Visi šie vārdi ir iekļauti testos.'),
+        h('div',{class:'row'},h('button',{class:'b',onclick:()=>go('test')},'✍️ Uz testu'),h('button',{class:'b alt',onclick:()=>repeatPass(cards,title)},'🔁 Vēlreiz'),h('button',{class:'b alt',onclick:()=>go('cards')},'Kartītes')));
+      return;
+    }
+    const c=q[0];
+    box.append(h('div',{class:'sub'},'🔁 '+title+' · atlicis '+q.length+' no '+total));
+    box.append(h('div',{class:'big'},c.en));
+    box.append(h('div',{class:'row'},h('button',{class:'b alt',onclick:()=>say(c.en)},'🔊 Klausīties'),h('button',{class:'b alt',onclick:()=>say(c.en,0.55)},'🐢 Lēnāk')));
+    const ans=h('div',{class:'row'});box.append(ans);
+    ans.append(h('button',{class:'b',onclick:reveal},'Rādīt nozīmi'));
+    say(c.en);
+    function reveal(){
+      ans.innerHTML='';
+      box.insertBefore(h('div',{class:'big',style:'color:var(--acc2)'},c.lv),ans);
+      const ex=(SENTS[c.en]||[])[0];
+      if(ex)box.insertBefore(h('div',{class:'sub',style:'cursor:pointer',onclick:()=>say(ex[0])},'🔊 '+ex[0]),ans);
+      ans.append(
+        h('button',{class:'b bad',onclick:()=>{q.shift();q.splice(Math.min(3,q.length),0,c);show();}},'Vēlreiz vēlāk'),
+        h('button',{class:'b ok',onclick:()=>{q.shift();c.miss=Math.max(0,(c.miss||0));seen++;show();}},'Atceros'));
+    }
+  }
+  show();
+}
+
+// Ātrā atlase: pieskaries tikai tiem vārdiem, ko NEZINI. Zināmie tiek izlaisti (nesaskaitās dienas limitā).
+function triage(){
+  app.innerHTML='';
+  const batch=newCards().slice(0,20);
+  const box=h('div',{class:'box'});app.append(box);
+  if(!batch.length){box.append(h('div',{class:'sub'},'Izvēlētajos līmeņos jaunu vārdu vairs nav.'),h('div',{class:'row'},h('button',{class:'b alt',onclick:()=>go('cards')},'← Atpakaļ')));return;}
+  const unk=new Set();
+  box.append(h('div',{class:'sub'},'Pieskaries vārdiem, kurus NEZINI (parādīsies tulkojums). Pārējie tiks atzīmēti kā zināmi un nāks retos atkārtojumos.'));
+  const grid=h('div',{style:'display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:12px 0'});
+  const paint=(t,c)=>{const u=unk.has(c.en);t.textContent=u?c.en+' — '+c.lv:c.en;t.style.border='2px solid '+(u?'var(--bad)':'var(--ok)');t.style.background=u?'#fdeaea':'#eaf7ef';};
+  batch.forEach(c=>{
+    const t=h('button',{class:'b alt',style:'padding:14px 8px;text-align:center'},c.en);
+    paint(t,c);
+    t.onclick=()=>{if(unk.has(c.en))unk.delete(c.en);else{unk.add(c.en);say(c.en);}paint(t,c);};
+    grid.append(t);
+  });
+  box.append(grid);
+  box.append(h('div',{class:'row'},
+    h('button',{class:'b ok',onclick:()=>{
+      const d=dayStat();
+      batch.forEach(c=>{
+        if(unk.has(c.en)){c.due=1;d.new++;(d.learn=d.learn||[]).push(c.en);}
+        else{c.reps=3;c.int=30;c.due=Date.now()+30*864e5;}
+      });
+      d.done+=batch.length-unk.size;save();go('cards');
+    }},'Gatavs'),
+    h('button',{class:'b alt',onclick:()=>go('cards')},'Atcelt')));
+}
+
+/* ============ 2) KLAUSIES ============ */
+function viewListen(){
+  app.append(statsBar());
+  const seen=Object.values(S.cards).filter(c=>c.reps>0||c.due>1);
+  const pool=seen.length>=5?seen:Object.values(S.cards);
+  const box=h('div',{class:'box'}); app.append(box);
+  function next(){
+    box.innerHTML='';
+    const due=dueCards();
+    const src=(due.length&&Math.random()<0.6)?due:pool;
+    const c=src[Math.floor(Math.random()*src.length)];
+    box.append(h('div',{class:'sub'},'Noklausies vārdu un uzraksti to angliski'));
+    box.append(h('div',{class:'row'},h('button',{class:'b',onclick:()=>say(c.en,0.8)},'🔊 Atskaņot'),h('button',{class:'b alt',onclick:()=>say(c.en,0.5)},'🐢 Lēnāk')));
+    const inp=h('input',{type:'text',autocomplete:'off',autocapitalize:'off',spellcheck:'false',placeholder:'Raksti šeit…'});
+    const msg=h('div',{class:'msg'});
+    box.append(inp,msg);
+    const btn=h('button',{class:'b ok'},'Pārbaudīt');
+    const row=h('div',{class:'row'},btn,h('button',{class:'b alt',onclick:()=>{msg.className='msg';msg.textContent='Atbilde: '+c.en+'  ('+c.lv+')';say(c.en);grade(c,0);row.innerHTML='';row.append(h('button',{class:'b',onclick:next},'Tālāk →'));}},'Nezinu'));
+    box.append(row);
+    inp.focus();
+    const check=()=>{
+      if(!inp.value.trim())return;
+      const okk=norm(inp.value)===norm(c.en);
+      msg.className='msg '+(okk?'ok-t':'bad-t');
+      msg.textContent=okk?'✅ Pareizi! '+c.en+' = '+c.lv:'❌ Pareizi: '+c.en+' ('+c.lv+')';
+      grade(c,okk?4:0); say(c.en);
+      row.innerHTML=''; row.append(h('button',{class:'b',onclick:next},'Tālāk →'));
+    };
+    btn.onclick=check;
+    inp.onkeydown=e=>{if(e.key==='Enter')check();};
+    say(c.en,0.8);
+  }
+  next();
+}
+
+/* ============ TESTS (rakstīšana) ============ */
+const dia=s=>s.toLowerCase().trim().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^\p{L}' ]/gu,'').replace(/\s+/g,' ');
+function stemMatch(a,b){ // pieņem citu galotni: garlaicīgi ~ garlaicīgs
+  if(Math.min(a.length,b.length)<5)return false;
+  let i=0; while(i<a.length&&i<b.length&&a[i]===b[i])i++;
+  return i>=4&&a.length-i<=2&&b.length-i<=2&&i>=Math.min(a.length,b.length)-2;
+}
+const MASTER=3;
+const RET=[3,5,8,12]; // pēc cik kārtām apgūtais vārds atgriežas (katru reizi retāk)
+const isMastered=(c,d)=>(c['ts'+d]||0)>=MASTER&&((S.rounds||0)-(c['mr'+d]||0))<RET[Math.min(c['mt'+d]||0,RET.length-1)];
+const SENT_N=30;
+const learnedCards=()=>Object.values(S.cards).filter(c=>(c.reps>0||c.due>0)&&active(c));
+const rndOf=a=>a[Math.floor(Math.random()*a.length)];
+function pickItems(cards,dirs,size,ignoreMastery){
+  const byCard=[];
+  cards.forEach(c=>{
+    const ps=[];
+    dirs.forEach(d=>{
+      if(d==='se'){const ss=SENTS[c.en]||[];if(!ss.length)return;if(ignoreMastery||!isMastered(c,d))ps.push({c,d,s:rndOf(ss)});}
+      else if(ignoreMastery||!isMastered(c,d))ps.push({c,d});
+    });
+    if(ps.length)byCard.push(ps);
+  });
+  if(!byCard.length)return ignoreMastery?[]:pickItems(cards,dirs,size,true);
+  const key=x=>Math.random()-(x.c.miss||0)*0.3;
+  const first=[],extra=[];
+  byCard.forEach(ps=>{ps.sort(()=>Math.random()-0.5);first.push(ps[0]);extra.push(...ps.slice(1));});
+  first.forEach(x=>x.k=key(x));extra.forEach(x=>x.k=key(x));
+  first.sort((a,b)=>a.k-b.k);extra.sort((a,b)=>a.k-b.k);
+  const pick=[...first,...extra].slice(0,size).sort(()=>Math.random()-0.5);
+  return pick.map(x=>({c:x.c,d:x.d,s:x.s,retry:false}));
+}
+function resetMastery(){Object.values(S.cards).forEach(c=>{['lv','en','sp','se'].forEach(d=>{delete c['ts'+d];delete c['mr'+d];delete c['mt'+d];});});save();}
+// Kopīga "kārta": jautājumi ar beigām un rezultātu. ask(it,box,report,next) uzzīmē jautājumu.
+function runSession(box,items,ask,again,menu){
+  const total=items.length,queue=items.slice();
+  let n=0,good=0;const wrong=[],mast=[],back=[];
+  const report=it=>ok=>{
+    if(it.retry)return;
+    n++;
+    const d=it.d,k='ts'+d,c=it.c;
+    if(ok){
+      good++;const before=c[k]||0;c.miss=Math.max(0,(c.miss||0)-1);
+      if(before>=MASTER){c['mt'+d]=(c['mt'+d]||0)+1;c['mr'+d]=S.rounds||0;back.push(c);}
+      else{c[k]=before+1;if(c[k]>=MASTER){c['mr'+d]=S.rounds||0;c['mt'+d]=c['mt'+d]||0;mast.push(c);}}
+    }else{c[k]=0;c.miss=(c.miss||0)+1;wrong.push(c);queue.push({c,d:it.d,m:it.m,s:it.s,retry:true});}
+    grade(c,ok?4:0);
+  };
+  function step(){
+    box.innerHTML='';
+    if(!queue.length)return summary();
+    const it=queue.shift();
+    box.append(h('div',{class:'sub'},(it.retry?'Vēlreiz (kļūda): ':((it.c['ts'+it.d]||0)>=MASTER?'🔁 ':'')+'Vārds '+(n+1)+' no '+total+'  ·  ')+'pareizi: '+good));
+    ask(it,box,report(it),step);
+  }
+  function summary(){
+    box.innerHTML='';S.rounds=(S.rounds||0)+1;save();
+    box.append(h('div',{class:'big'},good+' / '+total),h('div',{class:'sub'},'pareizi no pirmās reizes'));
+    if(wrong.length)box.append(h('p',{},h('b',{},'Atkārto šos vārdus:')),h('div',{},wrong.map(c=>h('div',{style:'font-size:18px'},c.en+' — '+c.lv))));
+    if(mast.length)box.append(h('p',{},h('b',{},'🏆 Apgūti (3 reizes pēc kārtas pareizi, vairs neprasīs): '),mast.map(c=>c.en).join(', ')));
+    if(back.length)box.append(h('p',{},h('b',{},'🔁 Atkārtoti un joprojām zini (nākamreiz būs retāk): '),back.map(c=>c.en).join(', ')));
+    box.append(h('div',{class:'row'},h('button',{class:'b',onclick:again},'Vēl viena kārta'),h('button',{class:'b alt',onclick:menu},'Izvēlne')));
+  }
+  step();
+}
+
+function viewTest(){
+  app.append(statsBar());
+  const L=learnedCards();
+  const box=h('div',{class:'box'}); app.append(box);
+  if(L.length<3){box.append(h('div',{class:'sub'},'Vispirms iemācies dažus vārdus kartītēs (vai nospied "Zinu jau"), tad te būs ko testēt.'));return;}
+  const withS=L.filter(c=>(SENTS[c.en]||[]).length);
+  const sentOn=L.length>=SENT_N&&withS.length>=5;
+  const dirsOf={lv:['lv'],en:['en'],mix:sentOn?['lv','en','se']:['lv','en'],sent:['se']};
+  const size=()=>S.rsize||50;
+  function menu(){
+    box.innerHTML='';
+    const open=d=>L.filter(c=>dirsOf[d].some(x=>x==='se'?((SENTS[c.en]||[]).length&&!isMastered(c,x)):!isMastered(c,x))).length;
+    box.append(h('div',{class:'sub'},'Iemācīti vārdi: '+L.length+'. Vārds izkrīt no testa, kad to 3 reizes pēc kārtas atbildi pareizi, un pēc 3–5 kārtām atkal atgriežas. '+(sentOn?'Teikumu uzdevumi ir ieslēgti (jauktajā režīmā).':'Teikumu uzdevumi ieslēgsies, kad būs '+SENT_N+' iemācīti vārdi.')));
+    const sz=h('div',{class:'row'},h('span',{class:'pill'},'Kārtas garums:'));
+    [20,50,100].forEach(n=>sz.append(h('button',{class:size()===n?'b':'b alt',onclick:()=>{S.rsize=n;save();menu();}},String(n))));
+    box.append(sz,h('div',{style:'height:6px'}));
+    const mk=(d,t,cls)=>h('button',{class:cls||'b',onclick:()=>start(d)},t+'  ('+open(d)+' vārdi atlicis)');
+    const list=[mk('lv','🇬🇧 → 🇱🇻  Redzu angliski, rakstu latviski'),mk('en','🇱🇻 → 🇬🇧  Redzu latviski, rakstu angliski'),mk('mix','🔀 Jaukti'+(sentOn?' (+ teikumi)':''),'b alt')];
+    if(sentOn)list.push(mk('sent','📝 Teikumi — ievieto trūkstošo vārdu','b alt'));
+    box.append(h('div',{class:'list'},list));
+    box.append(h('div',{class:'row'},h('button',{class:'b alt',onclick:()=>{resetMastery();go('test');}},'Atiestatīt "apgūtos"')));
+  }
+  function start(d){
+    const items=pickItems(L,dirsOf[d],size());
+    if(!items.length){box.innerHTML='';box.append(h('div',{class:'sub'},'Šajā režīmā nav ko jautāt.'),h('div',{class:'row'},h('button',{class:'b alt',onclick:menu},'Izvēlne')));return;}
+    runSession(box,items,ask,()=>start(d),menu);
+  }
+  function ask(it,box,report,next){
+    const c=it.c,d=it.d;
+    const parts=c.lv.split(/[,;\/]/).map(x=>x.trim().toLowerCase());
+    let cloze='';
+    if(d==='se'){
+      const [sent,form]=it.s;
+      cloze=sent.replace(new RegExp('\\b'+form.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b','i'),'_____');
+      box.append(h('div',{class:'sub'},'Ievieto trūkstošo angļu vārdu (nozīme: '+c.lv+')'));
+      box.append(h('div',{class:'big',style:'font-size:24px;line-height:1.5'},cloze));
+    }else{
+      box.append(h('div',{class:'sub'},d==='lv'?'Uzraksti latviski':'Uzraksti angliski'));
+      box.append(h('div',{class:'big'},d==='lv'?c.en:c.lv));
+      if(d==='lv'){box.append(h('div',{class:'row'},h('button',{class:'b alt',onclick:()=>say(c.en)},'🔊')));say(c.en);}
+    }
+    const inp=h('input',{type:'text',autocomplete:'off',autocapitalize:'off',spellcheck:'false',placeholder:'Raksti šeit…'});
+    const msg=h('div',{class:'msg'});
+    box.append(inp,msg);
+    let done=false;
+    const row=h('div',{class:'row'});
+    const answerOf=()=>d==='lv'?c.lv:(d==='se'?it.s[1]:c.en);
+    const finish=(okk,text,cls)=>{
+      done=true; msg.className='msg '+cls; msg.textContent=text;
+      report(okk);
+      if(d==='se'){msg.textContent=text+'\n'+it.s[0];say(it.s[0]);}else say(c.en);
+      if(!okk){msg.textContent='';msg.append(h('div',{style:'color:var(--bad)'},'❌ Pareizā atbilde:'),h('div',{class:'big',style:'color:var(--acc2);margin:6px 0'},answerOf()),h('div',{style:'color:#555'},d==='lv'?c.en:(d==='se'?c.en+' = '+c.lv:c.lv)));if(d==='se')msg.append(h('div',{style:'color:#555;margin-top:6px'},it.s[0]));}
+      row.innerHTML=''; row.append(h('button',{class:'b',onclick:next},'Tālāk →'),h('button',{class:'b alt',onclick:menu},'Beigt'));
+    };
+    const check=()=>{
+      if(done){next();return;}
+      if(!inp.value.trim())return;
+      let okk,note='';
+      if(d==='lv'){
+        const u=dia(inp.value), pd=parts.concat(c.lvl==='C1'?parts.filter(x=>x.includes(' ')).map(x=>x.split(' ')[0]).filter(x=>x.length>=4):[]).map(dia);
+        okk=pd.includes(u);
+        if(okk&&!parts.includes(inp.value.toLowerCase().trim()))note='  (raksti ar garumzīmēm: '+c.lv+')';
+        if(!okk&&pd.some(p=>stemMatch(p,u))){okk=true;note='  (vārda forma: '+c.lv+')';}
+      }else if(d==='se'){
+        okk=norm(inp.value)===norm(c.en)||norm(inp.value)===norm(it.s[1]);
+      }else okk=norm(inp.value)===norm(c.en);
+      const ans=d==='lv'?c.lv:(d==='se'?it.s[1]:c.en);
+      finish(okk, okk?'✅ Pareizi! '+(d==='se'?it.s[1]+' = '+c.lv:c.en+' = '+c.lv)+note:'❌ Pareizi: '+ans+'   ('+(d==='lv'?c.en:c.lv)+')', okk?'ok-t':'bad-t');
+    };
+    row.append(h('button',{class:'b ok',onclick:check},'Pārbaudīt'),h('button',{class:'b alt',onclick:()=>{if(done)return;const a=answerOf();msg.className='msg';msg.textContent='💡 '+a.slice(0,2)+'…  ('+a.length+' burti)';inp.focus();}},'💡 Palīdzība'),h('button',{class:'b alt',onclick:()=>{if(!done)finish(false,'Atbilde: '+(d==='lv'?c.lv:(d==='se'?it.s[1]:c.en))+'   ('+(d==='lv'?c.en:c.lv)+')','bad-t');}},'Nezinu'));
+    box.append(row);
+    inp.onkeydown=e=>{if(e.key==='Enter')check();};
+    inp.focus();
+  }
+  menu();
+}
+
+/* ============ RUNĀ (runas atpazīšana) ============ */
+const NUMW={0:'zero',1:'one',2:'two',3:'three',4:'four',5:'five',6:'six',7:'seven',8:'eight',9:'nine',10:'ten'};
+const HOM={one:['won'],two:['to','too'],four:['for'],eight:['ate'],no:['know'],write:['right'],see:['sea'],hear:['here'],buy:['by','bye'],red:['read'],read:['red','reed'],week:['weak'],night:['knight'],tea:['t'],meat:['meet'],new:['knew']};
+const spNorm=s=>s.toLowerCase().replace(/[^a-z0-9' ]/g,' ').replace(/\b\d+\b/g,m=>NUMW[m]||m).replace(/\s+/g,' ').trim();
+function spMatch(alts,target){
+  const t=spNorm(target),hom=HOM[t]||[];
+  return alts.some(a=>{const x=spNorm(a);return x===t||hom.includes(x)||(!t.includes(' ')&&x.split(' ').some(w=>w===t||hom.includes(w)));});
+}
+function viewSpeak(){
+  app.append(statsBar());
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  const box=h('div',{class:'box'}); app.append(box);
+  if(!SR){box.append(h('div',{class:'sub'},'Šis pārlūks neatbalsta runas atpazīšanu. Izmanto Chrome vai Edge datorā (vai Chrome Android telefonā).'));return;}
+  const L0=learnedCards(); const L=L0.length>=3?L0:Object.values(S.cards).filter(active);
+  function recog(cb){
+    const r=new SR(); r.lang='en-GB'; r.interimResults=false; r.maxAlternatives=5; r.continuous=false;
+    let fin=false; const out=(e,a)=>{if(fin)return;fin=true;cb(e,a);};
+    r.onresult=ev=>out(null,[...ev.results[0]].map(a=>a.transcript));
+    r.onerror=ev=>out(ev.error||'error');
+    r.onend=()=>out('no-speech');
+    try{r.start();}catch(e){out('error');}
+  }
+  function menu(){
+    box.innerHTML='';
+    const open=L.filter(c=>!isMastered(c,'sp')).length;
+    box.append(h('div',{class:'sub'},'Kārta = 10 vārdi. Vārds izkrīt, kad to 3 reizes pēc kārtas pasaki pareizi pirmajā mēģinājumā, un pēc 3–5 kārtām atkal atgriežas. Atlicis: '+open),h('div',{style:'height:10px'}));
+    box.append(h('div',{class:'list'},
+      h('button',{class:'b',onclick:()=>start('lv')},'🇱🇻 → 🎤  Redzu latviski, saku angliski'),
+      h('button',{class:'b alt',onclick:()=>start('rep')},'🔊 → 🎤  Dzirdu un atkārtoju')));
+    box.append(h('p',{class:'sub'},h('small',{class:'hint'},'Vajag Chrome/Edge, internetu un mikrofona atļauju. Lietotne pārbauda, vai runas atpazinējs tevi saprata: tas rāda, ka izruna ir saprotama, bet nav precīzs izrunas vērtējums.')));
+    box.append(h('div',{class:'row'},h('button',{class:'b alt',onclick:()=>{resetMastery();go('speak');}},'Atiestatīt "apgūtos"')));
+  }
+  function start(m){const items=pickItems(L,['sp'],10);items.forEach(i=>i.m=m);runSession(box,items,ask,()=>start(m),menu);}
+  function ask(it,box,report,next){
+    const c=it.c; let tries=0,done=false;
+    if('speechSynthesis' in window)speechSynthesis.cancel();
+    if(it.m==='lv'){box.append(h('div',{class:'sub'},'Pasaki angliski'),h('div',{class:'big'},c.lv));}
+    else{
+      box.append(h('div',{class:'sub'},'Noklausies un atkārto'),h('div',{class:'big'},c.en),h('div',{class:'sub'},c.lv),
+        h('div',{class:'row'},h('button',{class:'b alt',onclick:()=>say(c.en,0.8)},'🔊'),h('button',{class:'b alt',onclick:()=>say(c.en,0.5)},'🐢')));
+      say(c.en,0.8);
+    }
+    const msg=h('div',{class:'msg'}),row=h('div',{class:'row'});
+    const mic=h('button',{class:'b'},'🎤 Spied un runā');
+    const after=()=>{row.innerHTML='';row.append(h('button',{class:'b',onclick:next},'Tālāk →'),h('button',{class:'b alt',onclick:menu},'Beigt'));};
+    mic.onclick=()=>{
+      if(done)return;
+      if('speechSynthesis' in window)speechSynthesis.cancel();
+      mic.disabled=true; msg.className='msg'; msg.textContent='🎙️ Klausos… runā tagad';
+      recog((err,alts)=>{
+        mic.disabled=false;
+        if(err){
+          msg.className='msg bad-t';
+          msg.textContent=(err==='not-allowed'||err==='service-not-allowed')?'Atļauj mikrofonu pārlūkā (slēdzenes ikona adreses joslā).':err==='no-speech'?'Neko nedzirdēju, mēģini vēlreiz.':'Atpazīšana neizdevās ('+err+').';
+          return;
+        }
+        tries++;
+        if(spMatch(alts,c.en)){
+          done=true; msg.className='msg ok-t'; msg.textContent='✅ Pareizi! '+c.en+'  (dzirdēju: "'+alts[0]+'")';
+          report(tries===1); say(c.en,0.8); after();
+        }else{
+          msg.className='msg bad-t'; msg.textContent='❌ Dzirdēju: "'+alts[0]+'". Vajag: '+c.en+'  — mēģini vēlreiz';
+          say(c.en,0.8);
+        }
+      });
+    };
+    const skip=h('button',{class:'b alt',onclick:()=>{if(done)return;done=true;msg.className='msg bad-t';msg.textContent='Atbilde: '+c.en;report(false);say(c.en,0.8);after();}},'Nezinu');
+    row.append(mic,skip);
+    box.append(msg,row);
+  }
+  menu();
+}
+
+/* ============ 3) LASI ============ */
+const cache={};
+function stems(w){
+  const o=[w];
+  if(w.endsWith('ies'))o.push(w.slice(0,-3)+'y');
+  if(w.endsWith('es'))o.push(w.slice(0,-2));
+  if(w.endsWith('s'))o.push(w.slice(0,-1));
+  if(w.endsWith('ed')){o.push(w.slice(0,-2));o.push(w.slice(0,-1));}
+  if(w.endsWith('ing')){o.push(w.slice(0,-3));o.push(w.slice(0,-3)+'e');}
+  return o;
+}
+// Bieži sīkvārdi (bez interneta)
+const FUNC={the:'(noteiktais artikuls, latviski netulko)',a:'(nenoteiktais artikuls, latviski netulko)',an:'(nenoteiktais artikuls, latviski netulko)',i:'es',you:'tu / jūs',he:'viņš',she:'viņa',it:'tas',we:'mēs',they:'viņi',me:'man / mani',him:'viņu / viņam',us:'mums / mūs',them:'viņus / viņiem',my:'mans',your:'tavs / jūsu',his:'viņa',its:'tā',our:'mūsu',their:'viņu',is:'ir',are:'ir',am:'esmu',was:'bija',were:'bija',be:'būt',been:'bijis',being:'esot',have:'būt / ir',has:'ir',had:'bija',do:'darīt (arī palīgvārds)',does:'(palīgvārds jautājumos)',did:'(pagātnes palīgvārds)',will:'(nākotnes palīgvārds)',would:'(nosacījuma palīgvārds)',can:'varēt',could:'varētu',should:'vajadzētu',must:'jābūt / vajag',may:'drīkstēt',might:'varbūt',not:'ne',in:'iekšā / -ā',on:'uz',at:'pie / plkst.',to:'uz / lai',of:'no / (piederība)',for:'priekš / uz',with:'ar',from:'no',by:'pie / ar',about:'par / apmēram',into:'iekšā',over:'pāri / virs',under:'zem',up:'augšā',down:'lejā',out:'ārā',off:'nost',and:'un',but:'bet',or:'vai',so:'tāpēc / tik',then:'tad',than:'nekā',this:'šis',that:'tas / ka',these:'šie',those:'tie',here:'šeit',there:'tur',what:'kas / ko',who:'kas',whom:'kam / ko',whose:'kura',where:'kur',when:'kad',why:'kāpēc',how:'kā',which:'kurš',all:'viss',some:'daži',any:'jebkāds',no:'nē / nekāds',each:'katrs',as:'kā / kad',if:'ja',too:'arī / pārāk',very:'ļoti',just:'tikko / tikai',more:'vairāk',most:'visvairāk',much:'daudz',many:'daudz',own:'pašu',other:'cits',such:'tāds',only:'tikai',also:'arī',now:'tagad',well:'labi',back:'atpakaļ',one:'viens',two:'divi',three:'trīs'};
+async function mm(text){
+  if(cache[text])return cache[text];
+  try{
+    const r=await fetch('https://api.mymemory.translated.net/get?q='+encodeURIComponent(text.slice(0,450))+'&langpair=en|lv');
+    if(!r.ok)return {err:'Tulkošanas serviss atbildēja ar kļūdu ('+r.status+').'};
+    const j=await r.json();
+    const tr=(j.responseData&&j.responseData.translatedText)||'';
+    if(/MYMEMORY WARNING/i.test(tr)||j.quotaFinished)return {err:'Šodienas bezmaksas tulkojumu limits ir izsmelts. Mēģini rīt.'};
+    if(!tr)return {err:'Tulkojums netika atrasts.'};
+    return cache[text]={tr};
+  }catch(e){return {err:'Neizdevās sazināties ar tulkošanas servisu ('+(e&&e.message||'kļūda')+'). Pārbaudi internetu vai reklāmu bloķētāju.'};}
+}
+async function translate(w){
+  for(const s of stems(w)){ if(S.cards[s])return {tr:S.cards[s].lv,base:s,local:true}; }
+  if(FUNC[w])return {tr:FUNC[w],base:w,local:true,func:true};
+  const m=await mm(w);
+  return m.err?{tr:'⚠ '+m.err,base:w,local:false,error:true}:{tr:m.tr.toLowerCase(),base:w,local:false};
+}
+let cur=null,curSent=null;
+const readSet=()=>S.read||(S.read={});
+function nextStory(){
+  return STORIES.filter(x=>!readSet()[x.id]).sort((a,b)=>((LR[a.l]||0)-(LR[b.l]||0))||(hsh(a.id)-hsh(b.id)))[0];
+}
+function openStory(x){
+  openText(x.t,x.s,{label:'✔ Izlasīts — nākamais stāsts',done:()=>{readSet()[x.id]=true;save();const n=nextStory();n?openStory(n):go('read');}});
+}
+async function wiki(topic){
+  const msg=$('#wmsg');msg.className='msg';msg.textContent='Meklēju…';
+  try{
+    const base='https://simple.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=extracts&exintro=1&explaintext=1&exsentences=12&redirects=1&exlimit=8';
+    const url=topic?base+'&generator=search&gsrlimit=8&gsrsearch='+encodeURIComponent(topic):base+'&generator=random&grnnamespace=0&grnlimit=8';
+    const j=await (await fetch(url)).json();
+    const pages=Object.values((j.query||{}).pages||{}).filter(p=>p.extract&&p.extract.length>350).sort((a,b)=>(a.index||0)-(b.index||0));
+    if(!pages.length){msg.className='msg bad-t';msg.textContent='Nekas piemērots netika atrasts. Pamēģini citu tēmu.';return;}
+    const p=pages[Math.floor(Math.random()*Math.min(pages.length,topic?4:pages.length))];
+    openText(p.title,p.extract.replace(/\n{2,}/g,'\n').slice(0,1800),{label:'✔ Izlasīts — cits raksts',done:()=>{go('read');wiki(topic);}});
+  }catch(e){msg.className='msg bad-t';msg.textContent='Neizdevās atvērt Wikipedia ('+(e&&e.message||'kļūda')+'). Pārbaudi internetu.';}
+}
+function viewRead(){
+  const unread=STORIES.filter(x=>!readSet()[x.id]);
+  const n=nextStory();
+  const b1=h('div',{class:'box'},h('b',{},'📚 Stāsti angļu valodā'),h('p',{class:'sub'},'Izlasīti: '+(STORIES.length-unread.length)+' no '+STORIES.length));
+  if(n)b1.append(h('div',{class:'row'},h('button',{class:'b',onclick:()=>openStory(n)},'▶ Nākamais: '+n.t+' ('+n.l+')')));
+  else b1.append(h('div',{class:'sub'},'Visi iebūvētie stāsti izlasīti! Izmanto Wikipedia vai savu tekstu.'));
+  const list=h('div',{class:'list'});unread.slice(0,8).forEach(x=>list.append(h('button',{class:'b alt',onclick:()=>openStory(x)},'📄 '+x.t+' · '+x.l)));
+  b1.append(list);
+  if(STORIES.length-unread.length>0)b1.append(h('div',{class:'row'},h('button',{class:'b alt',onclick:()=>{if(confirm('Atzīmēt visus stāstus kā neizlasītus?')){S.read={};save();go('read');}}},'Atiestatīt izlasītos')));
+  const tp=h('input',{type:'text',placeholder:'tēma angliski, piem. cars, cooking, Latvia'});
+  const b2=h('div',{class:'box'},h('b',{},'🌐 Simple English Wikipedia'),h('p',{class:'sub'},'Raksti vienkāršākā angļu valodā. Vajag internetu.'),tp,
+    h('div',{class:'row'},h('button',{class:'b',onclick:()=>wiki(tp.value.trim())},'Atrast rakstu'),h('button',{class:'b alt',onclick:()=>wiki('')},'Nejaušs raksts')),h('div',{class:'msg',id:'wmsg'}));
+  const ta=h('textarea',{placeholder:'Ielīmē savu angļu tekstu šeit…'});
+  const b3=h('div',{class:'box'},h('b',{},'Savs teksts'),h('div',{style:'height:8px'}),ta,h('div',{class:'row'},h('button',{class:'b',onclick:()=>ta.value.trim()&&openText('Mans teksts',ta.value,{label:'✔ Pabeigts',done:()=>go('read')})},'Atvērt lasītājā')));
+  app.append(b1,b2,b3);
+}
+function openText(title,text,opts){
+  app.innerHTML='';
+  const box=h('div',{class:'box'});
+  box.append(h('div',{class:'row',style:'justify-content:space-between'},h('b',{},title),h('div',{},h('button',{class:'b alt',onclick:()=>say(text,0.8)},'🔊 Visu'),' ',h('button',{class:'b alt',onclick:()=>{$('#pop').style.display='none';go('read');}},'← Atpakaļ'))));
+  const t=h('div',{class:'txt'});
+  const sents=text.match(/[^.!?\n]+[.!?]*["']?\s*|\n+/g)||[text];
+  sents.forEach(sn=>{
+    const sentTxt=sn.trim();
+    sn.split(/(\s+)/).forEach(tok=>{
+      if(!tok||/^\s+$/.test(tok)){t.append(tok);return;}
+      const m=tok.match(/^([^A-Za-z']*)([A-Za-z'][A-Za-z'-]*)(.*)$/);
+      if(!m){t.append(tok);return;}
+      const w=m[2].toLowerCase();
+      const sp=h('span',{class:'w'+(stems(w).some(x=>S.cards[x]&&S.cards[x].reps>0)?' known':''),onclick:()=>popup(w,sentTxt)},m[2]);
+      t.append(m[1],sp,m[3]);
+    });
+  });
+  // frāzes tulkošana: atzīmē vairākus vārdus (velc ar peli/pirkstu)
+  const selHandler=()=>setTimeout(()=>{
+    const sel=window.getSelection();
+    if(!sel||sel.isCollapsed||!sel.rangeCount)return;
+    const r=sel.getRangeAt(0);
+    const spans=[...t.querySelectorAll('span.w')].filter(sp=>r.intersectsNode(sp));
+    if(spans.length<2||spans.length>40)return;
+    popup(spans.map(sp=>sp.textContent).join(' '),null);
+  },60);
+  t.addEventListener('mouseup',selHandler);t.addEventListener('touchend',selHandler);
+  box.append(t,h('small',{class:'hint'},'Uzspied uz vārda, lai redzētu tulkojumu. Lai tulkotu frāzi, atzīmē vairākus vārdus (velc ar peli vai pirkstu). Poga "Teikums" iztulko visu teikumu. Zaļa pasvītra = vārds, ko jau mācies.'));
+  if(opts&&opts.done)box.append(h('div',{class:'row'},h('button',{class:'b ok',onclick:()=>{$('#pop').style.display='none';opts.done();}},opts.label)));
+  app.append(box);
+}
+async function popup(text,sent){
+  const phrase=/\s/.test(text.trim());
+  $('#pw').textContent=text;$('#pt').textContent='…';$('#ps').textContent='';$('#pop').style.display='block';
+  $('#psent').style.display=(!phrase&&sent)?'':'none';
+  curSent=(!phrase&&sent)?sent:null;cur=null;
+  say(text,0.8);
+  let r;
+  if(phrase){const m=await mm(text);r=m.err?{tr:'⚠ '+m.err,base:text.toLowerCase(),error:true}:{tr:m.tr,base:text.toLowerCase()};}
+  else r=await translate(text.toLowerCase());
+  cur={w:r.base,lv:r.tr,bad:!!r.error||!!r.func};
+  $('#pt').textContent=r.tr+(r.local&&r.base!==text.toLowerCase()&&!r.func?'  (no: '+r.base+')':'');
+  $('#padd').textContent=S.cards[r.base]?'✔ Jau kartītēs':'＋ Pievienot kartītēm';
+}
+$('#pspeak').onclick=()=>say($('#pw').textContent,0.7);
+$('#pclose').onclick=()=>$('#pop').style.display='none';
+$('#psent').onclick=async()=>{
+  if(!curSent)return;
+  $('#ps').textContent='…';
+  const m=await mm(curSent);
+  $('#ps').textContent=curSent+'\n→ '+(m.err?'⚠ '+m.err:m.tr);
+};
+$('#padd').onclick=()=>{
+  if(!cur||cur.bad||S.cards[cur.w])return;
+  S.cards[cur.w]={en:cur.w,lv:cur.lv,ef:2.5,int:0,reps:0,due:0};save();
+  $('#padd').textContent='✔ Pievienots!';
+};
+
+/* ============ 4) VĒL ============ */
+function viewMore(){
+  const ta=h('textarea',{placeholder:'Ielīmē rezerves kopiju (JSON), lai atjaunotu…'});
+  const lvs=['A1','A2','B1','B2','C1'];
+  S.levels=S.levels||['A2','B1','B2','C1'];
+  const sets=h('div',{class:'box'},h('b',{},'Līmeņi un tempo'),h('p',{class:'sub'},'Kuri vārdi parādās kā jauni:'));
+  const rowL=h('div',{class:'row'});
+  lvs.forEach(l=>{const cb=h('input',{type:'checkbox'});cb.checked=S.levels.includes(l);cb.onchange=()=>{S.levels=lvs.filter(x=>x===l?cb.checked:S.levels.includes(x));save();};rowL.append(h('label',{style:'font-size:18px'},cb,' '+l+' ('+DECK.filter(d=>d[2]===l).length+')'));});
+  const n=h('input',{type:'number',min:'1',max:'100',style:'width:90px;font-size:18px;padding:8px;border:2px solid var(--line);border-radius:10px'});
+  n.value=S.npd||10; n.onchange=()=>{S.npd=Math.max(1,Math.min(100,+n.value||10));save();};
+  sets.append(rowL,h('div',{class:'row'},'Jauni vārdi dienā: ',n));
+  app.append(sets);
+  app.append(h('div',{class:'box'},
+    h('b',{},'Rezerves kopija'),
+    h('p',{class:'sub'},'Progress glabājas šajā pārlūkā. Lai pārnestu uz telefonu vai citu datoru, eksportē un importē.'),
+    h('div',{class:'row'},
+      h('button',{class:'b',onclick:()=>{const a=h('a',{href:URL.createObjectURL(new Blob([JSON.stringify(S)],{type:'application/json'})),download:'angļu-progress.json'});a.click();}},'⬇ Eksportēt'),
+      h('button',{class:'b alt',onclick:()=>{try{const d=JSON.parse(ta.value);if(!d.cards)throw 0;S=d;save();alert('Atjaunots!');go('cards');}catch(e){alert('Nederīgs JSON');}}},'⬆ Importēt no lauka zemāk')),
+    ta),
+    h('div',{class:'box'},h('b',{},'Pievienot savu vārdu'),
+      (()=>{const a=h('input',{type:'text',placeholder:'angliski'}),b=h('input',{type:'text',placeholder:'latviski',style:'margin-top:8px'});
+       return h('div',{},a,b,h('div',{class:'row'},h('button',{class:'b',onclick:()=>{const en=norm(a.value),lv=b.value.trim();if(en&&lv){S.cards[en]={en,lv,ef:2.5,int:0,reps:0,due:0};save();a.value=b.value='';alert('Pievienots');}}},'Pievienot')));})()));
+}
+
+go('cards');
+</script>
+</body>
+</html>
