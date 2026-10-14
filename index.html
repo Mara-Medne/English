@@ -2853,10 +2853,19 @@ const LR={A2:1,B1:2,B2:3,C1:4};
 function hsh(s){let x=2166136261;for(const ch of s){x^=ch.charCodeAt(0);x=Math.imul(x,16777619);}return x>>>0;}
 // jaunie vārdi: pēc līmeņa (A2→C1), bet katrā līmenī tēmas jauktas
 const newCards=()=>Object.values(S.cards).filter(c=>c.reps===0&&c.due===0&&active(c)).sort((a,b)=>((LR[a.lvl]||0)-(LR[b.lvl]||0))||(hsh(a.en)-hsh(b.en)));
+const HARD_N=2; // cik reizes "Nezinu" vienā dienā = vārds ir grūts un atgriežas nākamās dienas jaunajos vārdos
+// grūtie vārdi no iepriekšējām dienām tiek pievienoti šodienas jaunajiem (max puse no dienas limita)
+function adoptCarry(){
+  const d=dayStat();
+  const cs=Object.values(S.cards).filter(c=>c.reps===0&&c.cd&&c.cd<today()).sort((a,b)=>a.cd<b.cd?-1:1).slice(0,Math.max(1,Math.floor(NEW_PER_DAY()/2)));
+  cs.forEach(c=>{delete c.cd;if(!(d.learn=d.learn||[]).includes(c.en)){d.learn.push(c.en);d.new++;}(d.carried=d.carried||[]).push(c.en);});
+  if(cs.length)save();
+}
 function buildQueue(){
+  adoptCarry();
   const d=dayStat();
   const left=Math.max(0,NEW_PER_DAY()+(d.extra||0)-d.new);
-  const learn=(d.learn||[]).map(e=>S.cards[e]).filter(c=>c&&c.reps===0);
+  const learn=(d.learn||[]).map(e=>S.cards[e]).filter(c=>c&&c.reps===0&&c.cd!==today());
   return [...dueCards(), ...learn, ...newCards().slice(0,left)];
 }
 
@@ -2927,7 +2936,7 @@ function viewCards(){
     const isNew=c.reps===0&&c.due===0;
     const learning=c.reps===0;
     const x=xp.get(c)||0;
-    if(learning)box.append(h('div',{class:'sub'},'Mācāmais vārds — atkārtojums '+(x+1)+' no 3'));
+    if(learning)box.append(h('div',{class:'sub'},((dayStat().carried||[]).includes(c.en)?'↩️ Grūtais vārds no iepriekšējās dienas · ':'')+'Mācāmais vārds — atkārtojums '+(x+1)+' no 3'));
     box.append(h('div',{class:'big'},c.en));
     box.append(h('div',{class:'row'},h('button',{class:'b alt',onclick:()=>say(c.en)},'🔊 Klausīties'),h('button',{class:'b alt',onclick:()=>say(c.en,0.55)},'🐢 Lēnāk')));
     const ans=h('div',{class:'row'});
@@ -2940,24 +2949,32 @@ function viewCards(){
       box.insertBefore(h('div',{class:'big',style:'color:var(--acc2)'},c.lv),ans);
       const ex=(SENTS[c.en]||[])[0];
       if(ex)box.insertBefore(h('div',{class:'sub',style:'cursor:pointer',onclick:()=>say(ex[0])},'🔊 '+ex[0]),ans);
-      const rate=(qv)=>()=>{
-        const d=dayStat();
-        if(isNew){d.new++;c.due=1;(d.learn=d.learn||[]).push(c.en);save();}
-        q.shift();
-        if(learning){
-          if(qv<3){grade(c,0);xp.set(c,0);q.splice(Math.min(2,q.length),0,c);}
+      const firstSeen=()=>{const d=dayStat();if(isNew){d.new++;c.due=1;(d.learn=d.learn||[]).push(c.en);save();}};
+      // mācāmajiem vārdiem: Nezinu / Zinu
+      const know=ok=>()=>{
+        firstSeen();q.shift();
+        if(!ok){c.hn=(c.hn||0)+1;xp.set(c,0);q.splice(Math.min(2,q.length),0,c);save();}
+        else{
+          const nx=x+1;
+          if(nx<3){xp.set(c,nx);q.splice(Math.min(nx===1?4:10,q.length),0,c);save();}
           else{
-            const nx=x+1;
-            if(nx<3){xp.set(c,nx);q.splice(Math.min(nx===1?4:10,q.length),0,c);save();}
-            else{grade(c,qv);if(!c.ft){c.ft=Date.now();save();}}
+            if(!c.ft)c.ft=Date.now();
+            if((c.hn||0)>=HARD_N){c.cd=today();c.due=1;dayStat().done++;} // grūts: atgriezīsies rīt jauno vārdu sarakstā
+            else grade(c,4);
+            delete c.hn;save();
           }
-        }else{
-          grade(c,qv);
-          if(qv<3){xp.set(c,1);q.splice(Math.min(3,q.length),0,c);}
         }
         show();
       };
-      ans.append(h('button',{class:'b bad',onclick:rate(0)},'Vēlreiz'),h('button',{class:'b alt',onclick:rate(3)},'Grūti'),h('button',{class:'b ok',onclick:rate(4)},'Labi'),h('button',{class:'b y',onclick:rate(5)},'Viegli'));
+      // atkārtojamajiem vārdiem: Vēlreiz / Grūti / Labi / Viegli
+      const rate=(qv)=>()=>{
+        q.shift();
+        grade(c,qv);
+        if(qv<3){xp.set(c,1);q.splice(Math.min(3,q.length),0,c);}
+        show();
+      };
+      if(learning)ans.append(h('button',{class:'b bad',onclick:know(false)},'Nezinu'),h('button',{class:'b ok',onclick:know(true)},'Zinu'));
+      else ans.append(h('button',{class:'b bad',onclick:rate(0)},'Vēlreiz'),h('button',{class:'b alt',onclick:rate(3)},'Grūti'),h('button',{class:'b ok',onclick:rate(4)},'Labi'),h('button',{class:'b y',onclick:rate(5)},'Viegli'));
     }
   }
   show();
@@ -3156,7 +3173,7 @@ function viewTest(){
   }
   function ask(it,box,report,next){
     const c=it.c,d=it.d;
-    const parts=c.lv.split(/[,;\/]/).map(x=>x.trim().toLowerCase());
+    const parts=c.lv.split(/[,;\/]/).map(x=>x.trim().toLowerCase()).concat((c.alt||[]).map(x=>x.toLowerCase()));
     let cloze='';
     if(d==='se'){
       const [sent,form]=it.s;
@@ -3171,18 +3188,29 @@ function viewTest(){
     const inp=h('input',{type:'text',autocomplete:'off',autocapitalize:'off',spellcheck:'false',placeholder:'Raksti šeit…'});
     const msg=h('div',{class:'msg'});
     box.append(inp,msg);
-    let done=false;
+    let done=false,pending=false;
     const row=h('div',{class:'row'});
+    const flush=()=>{if(pending){pending=false;report(false);}};
+    const goNext=()=>{flush();next();};
+    const goMenu=()=>{flush();menu();};
     const answerOf=()=>d==='lv'?c.lv:(d==='se'?it.s[1]:c.en);
-    const finish=(okk,text,cls)=>{
+    const finish=(okk,text,cls,typed)=>{
       done=true; msg.className='msg '+cls; msg.textContent=text;
-      report(okk);
+      if(!okk&&typed&&(d==='lv'||d==='en'))pending=true; else report(okk);
       if(d==='se'){msg.textContent=text+'\n'+it.s[0];say(it.s[0]);}else say(c.en);
       if(!okk){msg.textContent='';msg.append(h('div',{style:'color:var(--bad)'},'❌ Pareizā atbilde:'),h('div',{class:'big',style:'color:var(--acc2);margin:6px 0'},answerOf()),h('div',{style:'color:#555'},d==='lv'?c.en:(d==='se'?c.en+' = '+c.lv:c.lv)));if(d==='se')msg.append(h('div',{style:'color:#555;margin-top:6px'},it.s[0]));}
-      row.innerHTML=''; row.append(h('button',{class:'b',onclick:next},'Tālāk →'),h('button',{class:'b alt',onclick:menu},'Beigt'));
+      row.innerHTML=''; row.append(h('button',{class:'b',onclick:goNext},'Tālāk →'));
+      if(pending&&S.synBtn!==false)row.append(h('button',{class:'b y',onclick:()=>{
+        const v=inp.value.trim();const key=d==='lv'?'alt':'alen';
+        c[key]=c[key]||[];if(!c[key].some(x=>x.toLowerCase()===v.toLowerCase()))c[key].push(v);
+        pending=false;report(true);save();
+        msg.className='msg ok-t';msg.textContent='✅ Pievienots pieņemtajām atbildēm: '+v+' = '+(d==='lv'?c.en:c.lv);
+        row.innerHTML='';row.append(h('button',{class:'b',onclick:next},'Tālāk →'),h('button',{class:'b alt',onclick:menu},'Beigt'));
+      }},'✔ Mana atbilde ir pareiza'));
+      row.append(h('button',{class:'b alt',onclick:goMenu},'Beigt'));
     };
     const check=()=>{
-      if(done){next();return;}
+      if(done){goNext();return;}
       if(!inp.value.trim())return;
       let okk,note='';
       if(d==='lv'){
@@ -3192,9 +3220,9 @@ function viewTest(){
         if(!okk&&pd.some(p=>stemMatch(p,u))){okk=true;note='  (vārda forma: '+c.lv+')';}
       }else if(d==='se'){
         okk=norm(inp.value)===norm(c.en)||norm(inp.value)===norm(it.s[1]);
-      }else okk=norm(inp.value)===norm(c.en);
+      }else okk=norm(inp.value)===norm(c.en)||(c.alen||[]).some(x=>norm(x)===norm(inp.value));
       const ans=d==='lv'?c.lv:(d==='se'?it.s[1]:c.en);
-      finish(okk, okk?'✅ Pareizi! '+(d==='se'?it.s[1]+' = '+c.lv:c.en+' = '+c.lv)+note:'❌ Pareizi: '+ans+'   ('+(d==='lv'?c.en:c.lv)+')', okk?'ok-t':'bad-t');
+      finish(okk, okk?'✅ Pareizi! '+(d==='se'?it.s[1]+' = '+c.lv:c.en+' = '+c.lv)+note:'❌ Pareizi: '+ans+'   ('+(d==='lv'?c.en:c.lv)+')', okk?'ok-t':'bad-t',true);
     };
     row.append(h('button',{class:'b ok',onclick:check},'Pārbaudīt'),h('button',{class:'b alt',onclick:()=>{if(done)return;const a=answerOf();msg.className='msg';msg.textContent='💡 '+a.slice(0,2)+'…  ('+a.length+' burti)';inp.focus();}},'💡 Palīdzība'),h('button',{class:'b alt',onclick:()=>{if(!done)finish(false,'Atbilde: '+(d==='lv'?c.lv:(d==='se'?it.s[1]:c.en))+'   ('+(d==='lv'?c.en:c.lv)+')','bad-t');}},'Nezinu'));
     box.append(row);
@@ -3414,6 +3442,23 @@ function viewMore(){
   n.value=S.npd||10; n.onchange=()=>{S.npd=Math.max(1,Math.min(100,+n.value||10));save();};
   sets.append(rowL,h('div',{class:'row'},'Jauni vārdi dienā: ',n));
   app.append(sets);
+  // sinonīmu iestatījumi
+  const synBox=h('div',{class:'box'});app.append(synBox);
+  function drawSyn(){
+    synBox.innerHTML='';
+    synBox.append(h('b',{},'Sinonīmi testos'));
+    const cb=h('input',{type:'checkbox'});cb.checked=S.synBtn!==false;cb.onchange=()=>{S.synBtn=cb.checked;save();};
+    synBox.append(h('p',{},h('label',{style:'font-size:17px'},cb,' Rādīt pogu "✔ Mana atbilde ir pareiza" pēc kļūdainas atbildes')));
+    const items=[];
+    Object.values(S.cards).forEach(c=>{(c.alt||[]).forEach(x=>items.push({c,k:'alt',x}));(c.alen||[]).forEach(x=>items.push({c,k:'alen',x}));});
+    if(!items.length){synBox.append(h('p',{class:'sub'},'Pievienotu sinonīmu vēl nav.'));return;}
+    synBox.append(h('p',{class:'sub'},'Pievienotie sinonīmi ('+items.length+'). Spied ✕, lai dzēstu tikai konkrēto:'));
+    items.forEach(({c,k,x})=>synBox.append(h('div',{class:'row',style:'justify-content:space-between;align-items:center'},
+      h('span',{style:'font-size:17px'},k==='alt'?c.en+' → '+x+'  (oriģināls: '+c.lv+')':c.lv+' → '+x+'  (oriģināls: '+c.en+')'),
+      h('button',{class:'b alt',style:'padding:6px 12px',onclick:()=>{c[k]=c[k].filter(y=>y!==x);if(!c[k].length)delete c[k];save();drawSyn();}},'✕'))));
+    synBox.append(h('div',{class:'row'},h('button',{class:'b bad',onclick:()=>{if(confirm('Dzēst VISUS pievienotos sinonīmus visiem vārdiem?')){Object.values(S.cards).forEach(c=>{delete c.alt;delete c.alen;});save();drawSyn();}}},'Dzēst visus sinonīmus')));
+  }
+  drawSyn();
   app.append(h('div',{class:'box'},
     h('b',{},'Rezerves kopija'),
     h('p',{class:'sub'},'Progress glabājas šajā pārlūkā. Lai pārnestu uz telefonu vai citu datoru, eksportē un importē.'),
